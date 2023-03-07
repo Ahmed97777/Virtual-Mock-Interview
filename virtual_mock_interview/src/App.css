@@ -1,4 +1,26 @@
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+font-family: 'Work Sans', sans-serif;
+}
+
+/* Start Global Rules */
+* {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+#pe {
+    font-weight: bold;
+}
+
+
 .first {
     text-align: center;
     margin-top: 30px;
 }
+
+
