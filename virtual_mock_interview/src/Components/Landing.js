@@ -9,7 +9,9 @@ const Landing = () => {
                 <p>Empowering job seekers with an intelligent and unbiased interview preparation platforms that leverages advanced technology 
                     and user-driven insights to increase their chances of landing their dream job.
                 </p>
+                <button className="button-start" >Start Interview <span className="triangle"></span></button>
             </div>
+            
         </div>
 
     )

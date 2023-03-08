@@ -41,6 +41,7 @@ background: linear-gradient(to right, #2c2826, #000000);
     /* margin: 64px; */
     height: calc(100vh - 240px);
     position: relative;
+    border-bottom: 5px solid black;
 }
 
 .intro-text {
@@ -56,12 +57,35 @@ background: linear-gradient(to right, #2c2826, #000000);
 
 .landing .intro-text h1 {
     margin: 0;
-    color: white;
     font-weight: bold;
     font-size: 63px;
 }
 
 .landing .intro-text p {
+    margin: 0;
+    color: #cbc6c5;
+    margin-top: 20px;
     font-size: 17px;
     line-height: 1.8;
+}
+
+.button-start {
+    margin: 0;
+    margin-top: 25px;
+    background: linear-gradient(to right, #ff4830, #fc5000);
+    border: none;
+    color: white;
+    width: 250px;
+    height: 50px;
+    border-radius: 25px;
+    cursor: pointer;
+}
+
+.button-start span {
+    display: inline-block;
+    margin-left: 6px;
+    translate: 0 18%;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-left: 12px solid white;
 }
