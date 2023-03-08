@@ -37,3 +37,31 @@ background: linear-gradient(to right, #2c2826, #000000);
     z-index: 9;
 }
 
+.landing {
+    /* margin: 64px; */
+    height: calc(100vh - 240px);
+    position: relative;
+}
+
+.intro-text {
+    text-align: center;
+    color: white;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    translate: -50% -50%;
+    width: 640px;
+    max-width: 100%;
+}
+
+.landing .intro-text h1 {
+    margin: 0;
+    color: white;
+    font-weight: bold;
+    font-size: 63px;
+}
+
+.landing .intro-text p {
+    font-size: 17px;
+    line-height: 1.8;
+}
