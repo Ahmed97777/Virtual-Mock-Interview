@@ -1,14 +1,15 @@
 import "./App.css";
+import Header from "./Components/Header";
+import Landing from "./Components/Landing";
 
 function App() {
   return (
     <div className="App">
-      <h1 className="first">Welcome to the first commit.</h1>
+      
+      <Header/>
+      <Landing/>
 
-      <div>This is div 1</div>
-      <div>This is div 1</div>
 
-      <p id="pe">This is p 1</p>
     </div>
   );
 }
