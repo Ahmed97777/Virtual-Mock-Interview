@@ -4,8 +4,13 @@ html {
 
 body {
 font-family: 'Work Sans', sans-serif;
-background: #2c2826; /*Fallback color*/
-background: linear-gradient(to right, #2c2826, #000000);
+/* background: #2c2826; Fallback color */
+/* background: linear-gradient(to right, #2c2826, #000000); */
+}
+
+.App {
+    background: #2c2826; /*Fallback color*/
+    background: linear-gradient(to right, #2c2826, #000000);
 }
 
 /* Start Global Rules */
@@ -24,11 +29,15 @@ background: linear-gradient(to right, #2c2826, #000000);
     /* border-bottom: 20px solid black; */
 }
 
+.top-logo-menu {
+    position: relative;
+}
+
 .logo-name {
     margin: 0;
     text-decoration: none;
     color: white;
-    position: fixed;
+    position: absolute;
     left: 25px;
     top: 10px;
     font-size: 30px;
@@ -39,9 +48,10 @@ background: linear-gradient(to right, #2c2826, #000000);
 
 .landing {
     /* margin: 64px; */
+    background: #2c2826; /*Fallback color*/
+    background: linear-gradient(to right, #2c2826, #000000);
     height: calc(100vh - 240px);
     position: relative;
-    border-bottom: 5px solid black;
 }
 
 .intro-text {
@@ -89,3 +99,148 @@ background: linear-gradient(to right, #2c2826, #000000);
     border-bottom: 8px solid transparent;
     border-left: 12px solid white;
 }
+
+.main {
+    position: relative;
+    border-top: 5px solid black;
+    background: linear-gradient(to right, #ff4830, #fc5000);
+    height: 700px;
+    width: 100%;
+    margin: 0;
+}
+
+.main-title {
+    color: white;
+    font-size: 29px;
+    position: absolute;
+    left: 100px;
+    top: 55px;
+}
+
+.main-content {
+    position: absolute;
+    left: 285px;
+    width: 63%;
+    top: 150px;
+    gap: 200px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.main-content img {
+    width: 250px;
+    height: 250px;
+}
+
+.main-content div {
+    text-align: center;
+    color: white;
+}
+
+.main-content h4 {
+    
+    font-size: 25px;
+}
+
+.main-content p {
+    font-size: 16px;
+    max-width: 650px;
+}
+
+@media(max-width:1130px) {
+    .main-title {
+    font-size: 28px;
+    left: 50px;
+    top: 50px;
+    }
+    .main-content {
+        left: 206px;
+    }
+
+}
+
+
+@media(max-width:1040px) {
+    .main-title {
+    font-size: 25px;
+    left: 22px;
+    top: 50px;
+    }
+    .main-content {
+        left: 156px;
+    }
+
+}
+
+
+@media(max-width:915px) {
+    
+.main-content {
+    left: 99px;
+}
+
+}
+
+
+@media(max-width:830px) {
+    
+.main-content {
+    left: 51px;
+    width: 63%;
+}
+
+}
+
+
+@media(max-width:780px) {
+    
+.main-content {
+    left: 138px;
+    top: 140px;
+    gap: 125px;
+    grid-template-columns: repeat(1, 1fr);
+}
+
+.main-title {
+    font-size: 25px;
+    left: 22px;
+    top: 50px;
+}
+
+.main {
+    height: 1300px;
+}
+}
+
+@media(max-width:668px) {
+    
+    .main-content {
+        left: 114px;
+    }
+    
+    }
+
+@media(max-width:668px) {
+    
+    .main-content {
+        left: 96px;
+    }
+        
+} 
+
+@media(max-width:600px) {
+    
+    .landing .intro-text h1 {
+        font-size: 60px;
+    }
+
+    .landing .intro-text p {
+        font-size: 14px;
+    }
+
+    .button-start {
+        width: 228px;
+    }
+    
+} 
+

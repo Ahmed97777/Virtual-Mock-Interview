@@ -1,6 +1,8 @@
 import "./App.css";
 import Header from "./Components/Header";
 import Landing from "./Components/Landing";
+import HomeMain from "./Components/HomeMain";
+
 
 function App() {
   return (
@@ -8,7 +10,7 @@ function App() {
       
       <Header/>
       <Landing/>
-
+      <HomeMain/>
 
     </div>
   );
