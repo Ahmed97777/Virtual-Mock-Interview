@@ -15,8 +15,8 @@ const HomeMain = () => {
                 <div>
                     <img src="/unnamed2.png" alt="voice img" ></img>
                     <h4>Voice Analysis Model</h4>
-                    <p>Analyze user's answers, finding repetitive words,</p>
-                    <p>emotion detection, and silent moments</p>
+                    <p>Analyze user's answers, finding repetitive</p>
+                    <p>words, emotion detection, and silent moments</p>
                 </div>
             </div>
         </div>

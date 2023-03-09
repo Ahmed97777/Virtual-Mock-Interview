@@ -244,3 +244,26 @@ font-family: 'Work Sans', sans-serif;
     
 } 
 
+.footer {
+    background: #2c2826; /*Fallback color*/
+    background: linear-gradient(to right, #8d0c00, #a02b2b);
+    padding: 30px 10px;
+    color: white;
+    text-align: center;
+    font-size: 18px;
+}
+
+.footer span {
+    color: #fc5000;
+    font-weight: bold;
+}
+
+.footer p {
+    margin-bottom: 40px;
+}
+
+.footer a {
+    text-decoration: none;
+    color: #fc5000;
+    font-weight: bold;
+}
