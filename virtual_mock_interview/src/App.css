@@ -4,8 +4,8 @@ html {
 
 body {
 font-family: 'Work Sans', sans-serif;
-/* background: #2c2826; Fallback color */
-/* background: linear-gradient(to right, #2c2826, #000000); */
+background: #2c2826; /* Fallback color */
+background: linear-gradient(to right, #2c2826, #000000);
 }
 
 .App {
@@ -159,6 +159,32 @@ font-family: 'Work Sans', sans-serif;
 
 }
 
+@media(max-height:610px) {
+    
+    .landing {
+        margin-bottom: 50px;
+    }
+
+}
+
+@media(max-height:490px) {
+    
+    .landing {
+        margin-top: 100px;
+        margin-bottom: 150px;
+    }
+
+}
+
+@media(max-height:300px) {
+    
+    .landing {
+        margin-top: 200px;
+        margin-bottom: 250px;
+    }
+
+}
+
 
 @media(max-width:1040px) {
     .main-title {
@@ -244,11 +270,18 @@ font-family: 'Work Sans', sans-serif;
     
 } 
 
+.footer-container {
+    position: relative;
+}
+
 .footer {
     background: #2c2826; /*Fallback color*/
     background: linear-gradient(to right, #8d0c00, #a02b2b);
     padding: 30px 10px;
     color: white;
+    position: absolute;
+    width: 100%;
+    margin-top: auto;
     text-align: center;
     font-size: 18px;
 }
@@ -258,12 +291,34 @@ font-family: 'Work Sans', sans-serif;
     font-weight: bold;
 }
 
-.footer p {
+/* .footer p {
     margin-bottom: 40px;
-}
+} */
 
 .footer a {
     text-decoration: none;
     color: #fc5000;
     font-weight: bold;
+}
+
+.instructions-container {
+    margin-top: -60px;
+    margin-left: -65px;
+    margin-bottom: 100px;
+}
+
+.main-title-2 {
+    color: white;
+    font-size: 20px;
+}
+
+.third-one {
+    margin-left: 25px;
+}
+
+.instructions-parent {
+    border-top: 5px solid black;
+    background-color: rgb(111, 40, 40);
+    padding: 100px;
+    height: 700px;
 }
