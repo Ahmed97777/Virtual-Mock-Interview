@@ -11,16 +11,14 @@ function App() {
   return (
     <div className="App">
       
-      {/* A Header that will always be there */}
-      <Header/>
-
+      
       {/* The differences will be here */}
       <BrowserRouter>
         <Routes>
 
-          <Route  path="/" element= {<div><Landing/><HomeMain/></div>} />
+          <Route  path="/" element= {<div><Header/><Landing/><HomeMain/></div>} />
           <Route  path="/configuration" element= {<Config/>} />
-          <Route  path="*" element= {<NotFound/>} />
+          <Route  path="*" element= {<div><Header/><NotFound/></div>} />
 
         </Routes>
       </BrowserRouter>

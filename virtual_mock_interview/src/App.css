@@ -19,13 +19,14 @@ background: linear-gradient(to right, #2c2826, #000000);
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
+/* End Global Rules */
 
 .logo-container {
     margin: 0;
     background: #2c2826; /*Fallback color*/
     background: linear-gradient(to right, #2c2826, #000000);
     width: 100%;
-    height: 100px;
+    height: 55px;
     /* border-bottom: 20px solid black; */
 }
 
@@ -50,7 +51,8 @@ background: linear-gradient(to right, #2c2826, #000000);
     /* margin: 64px; */
     background: #2c2826; /*Fallback color*/
     background: linear-gradient(to right, #2c2826, #000000);
-    height: calc(100vh - 240px);
+    height: calc(100vh - 193px);
+    /* height: 539px; */
     position: relative;
 }
 
@@ -89,6 +91,12 @@ background: linear-gradient(to right, #2c2826, #000000);
     height: 50px;
     border-radius: 25px;
     cursor: pointer;
+    transition: all 0.3s ease 0s;
+}
+
+.button-start:hover {
+    box-shadow: 0px 15px 20px rgba(212, 72, 7, 0.4);
+    transform: translateY(-3px);
 }
 
 .button-start span {
@@ -302,23 +310,84 @@ background: linear-gradient(to right, #2c2826, #000000);
 }
 
 .instructions-container {
-    margin-top: -60px;
-    margin-left: -65px;
-    margin-bottom: 100px;
+    margin-left: 75px;
 }
 
 .main-title-2 {
     color: white;
-    font-size: 20px;
-}
-
-.third-one {
-    margin-left: 25px;
+    font-size: 19px;
 }
 
 .instructions-parent {
-    border-top: 5px solid black;
+    border-top: 5px solid #641919;
     background-color: rgb(111, 40, 40);
-    padding: 100px;
-    height: 700px;
+    /* padding: 100px; */
+    padding: 15px;
+    padding-top: 25px;
+    height: 135px;
 }
+
+.logo-container-for-config {
+    margin: 0;
+    /* background: #2c2826; Fallback color */
+    /* background: linear-gradient(to right, #2c2826, #000000); */
+    background-color: rgb(111 40 40);
+    width: 100%;
+    height: 55px;
+}
+
+.top-logo-menu-for-config {
+    position: relative;
+}
+
+.logo-name-for-config {
+    margin: 0;
+    text-decoration: none;
+    color: white;
+    position: absolute;
+    left: 25px;
+    top: 10px;
+    font-size: 30px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    z-index: 9;
+}
+
+/* Start the configuration process: */
+.config-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 600px;
+    background-color: rgb(111, 40, 40);
+    padding-bottom: 25px;
+}
+
+.config-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 525px;
+    height: 265px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    margin: 0 15px 15px 15px;
+    background-color: rgba(255, 255, 255, 0.1);
+    /* background-color: rgba(0, 0, 0, 0.1); */
+}
+
+.config-img {
+    width: 100px;
+    height: 100px;
+    margin-bottom: 10px;
+}
+
+.config-box p {
+    font-size: 18px;
+    color: white;
+    text-align: center;
+    margin: 0;
+}
+
+/* Ending the configuration process: */
