@@ -11,6 +11,14 @@ background: linear-gradient(to right, #2c2826, #000000);
 .App {
     background: #2c2826; /*Fallback color*/
     background: linear-gradient(to right, #2c2826, #000000);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.the-main {
+    flex: 1;
+    /* background-color: rgb(111, 40, 40); */
 }
 
 /* Start Global Rules */
@@ -84,6 +92,7 @@ background: linear-gradient(to right, #2c2826, #000000);
 .button-start {
     margin: 0;
     margin-top: 25px;
+    margin-bottom: 25px;
     background: linear-gradient(to right, #ff4830, #fc5000);
     border: none;
     color: white;
@@ -279,6 +288,7 @@ background: linear-gradient(to right, #2c2826, #000000);
 } 
 
 .footer-container {
+    margin-top: auto;
     position: relative;
 }
 
@@ -287,8 +297,8 @@ background: linear-gradient(to right, #2c2826, #000000);
     background: linear-gradient(to right, #8d0c00, #a02b2b);
     padding: 30px 10px;
     color: white;
-    position: absolute;
     width: 100%;
+    /* height: 200px; */
     margin-top: auto;
     text-align: center;
     font-size: 18px;
@@ -298,10 +308,6 @@ background: linear-gradient(to right, #2c2826, #000000);
     color: #fc5000;
     font-weight: bold;
 }
-
-/* .footer p {
-    margin-bottom: 40px;
-} */
 
 .footer a {
     text-decoration: none;
@@ -358,9 +364,9 @@ background: linear-gradient(to right, #2c2826, #000000);
     display: flex;
     flex-direction: column;
     align-items: center;
-    height: 600px;
+    height: auto;
     background-color: rgb(111, 40, 40);
-    padding-bottom: 25px;
+    padding-bottom: 75px;
 }
 
 .config-box {
@@ -375,6 +381,12 @@ background: linear-gradient(to right, #2c2826, #000000);
     margin: 0 15px 15px 15px;
     background-color: rgba(255, 255, 255, 0.1);
     /* background-color: rgba(0, 0, 0, 0.1); */
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.config-box:hover {
+    background-color: rgb(114, 76, 76);
 }
 
 .config-img {
@@ -391,3 +403,30 @@ background: linear-gradient(to right, #2c2826, #000000);
 }
 
 /* Ending the configuration process: */
+
+
+/* starting field.js style */
+
+.field-container {
+    display: grid;
+    /* grid-template-columns: repeat(4, 1fr); */
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    width: 100%;
+    padding-left: 90px;
+    padding-right: 90px;
+}
+
+.field-container h3 {
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    text-align: center;
+    margin-right: 15px;
+    margin-bottom: 15px;
+    padding: 15px
+}
+
+
+/* ending field.js style */
+
+
+

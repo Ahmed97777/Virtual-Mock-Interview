@@ -19,7 +19,7 @@ const Config = () => {
             
                 <div className="instructions-container" >
                     <h2 className="main-title-2" >How to start the interview:</h2>
-                    <h2 className="main-title-2" >1- Please allow access for camera permission, mic permission</h2>
+                    <h2 className="main-title-2" >1- Please allow access for camera permission, mic permission:</h2>
                 </div>
 
 
