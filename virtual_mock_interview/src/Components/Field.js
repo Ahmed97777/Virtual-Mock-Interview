@@ -1,15 +1,20 @@
+import React, { useEffect } from 'react';
 import { Link } from "react-router-dom"
 
 const Field = () => {
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+        }, []);
 
     return (
 
         <>
 
 
-            <div className="logo-container-for-config" id="page-top" >
+            <div className="logo-container-for-config" >
                 <div className="top-logo-menu-for-config" >
-                    <a className="logo-name-for-config" href="#page-top" >VMI</a>
+                    <a className="logo-name-for-config" href="/" >VMI</a>
                 </div>
             </div>
 
@@ -47,13 +52,12 @@ const Field = () => {
                     
                 </div>
 
-                <Link to="/y" ><button className="button-start" >Next <span className="triangle"></span></button></Link>
+                <Link to="/example-case" ><button className="button-start" >Next <span className="triangle"></span></button></Link>
             </div>
 
 
 
             {/* Ending the configuration process */}
-
 
     
     

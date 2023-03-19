@@ -7,6 +7,9 @@ import {BrowserRouter, Routes, Route} from "react-router-dom";
 import NotFound from "./Components/NotFound";
 import Config from "./Components/Config";
 import Field from "./Components/Field";
+import ExampleCase from "./Components/ExampleCase";
+import Interview from "./Components/Interview";
+import Report from "./Components/Report";
 
 
 function App() {
@@ -22,6 +25,9 @@ function App() {
           <Route  path="/" element= {<div><Header/><Landing/><HomeMain/></div>} />
           <Route  path="/configuration" element= {<Config/>} />
           <Route  path="/field" element= {<Field/>} />
+          <Route  path="/example-case" element= {<ExampleCase/>} />
+          <Route  path="/interview" element= {<Interview/>} />
+          <Route  path="/report" element= {<Report/>} />
           <Route  path="*" element= {<div><Header/><NotFound/></div>} />
 
         </Routes>

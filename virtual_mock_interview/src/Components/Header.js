@@ -5,7 +5,7 @@ const Header = () => {
 
         <div className="logo-container" id="page-top" >
             <div className="top-logo-menu" >
-                <a className="logo-name" href="#page-top" >VMI</a>
+                <a className="logo-name" href="/" >VMI</a>
             </div>
         </div>
 

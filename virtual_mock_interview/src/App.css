@@ -27,6 +27,55 @@ background: linear-gradient(to right, #2c2826, #000000);
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
+
+/* For Chrome, Safari, and Opera */
+::-webkit-scrollbar {
+    width: 11px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #fc5000;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background-color: #766464;
+    box-shadow: inset 0px 0px 5px 0px black;
+    border-radius: 3px;
+}
+
+  /* For Firefox */
+::-moz-scrollbar {
+    width: 11px;
+}
+
+::-moz-scrollbar-thumb {
+    background: #fc5000;
+    border-radius: 10px;
+}
+
+::-moz-scrollbar-track {
+    background-color: #766464;
+    box-shadow: inset 0px 0px 5px 0px black;
+    border-radius: 3px;
+}
+
+  /* For Edge */
+::-ms-scrollbar {
+    width: 11px;
+}
+
+::-ms-scrollbar-thumb {
+    background: #fc5000;
+    border-radius: 10px;
+}
+
+::-ms-scrollbar-track {
+    background-color: #766464;
+    box-shadow: inset 0px 0px 5px 0px black;
+    border-radius: 3px;
+}
+
 /* End Global Rules */
 
 .logo-container {
@@ -330,7 +379,7 @@ background: linear-gradient(to right, #2c2826, #000000);
     /* padding: 100px; */
     padding: 15px;
     padding-top: 25px;
-    height: 135px;
+    /* height: 135px; */
 }
 
 .logo-container-for-config {
@@ -385,6 +434,12 @@ background: linear-gradient(to right, #2c2826, #000000);
     cursor: pointer;
 }
 
+.example {
+    width: 725px;
+    height: 400px;
+    margin-top: 25px;
+}
+
 .config-box:hover {
     background-color: rgb(114, 76, 76);
 }
@@ -414,6 +469,7 @@ background: linear-gradient(to right, #2c2826, #000000);
     width: 100%;
     padding-left: 90px;
     padding-right: 90px;
+    transition: 0.3s;
 }
 
 .field-container h3 {
@@ -425,8 +481,259 @@ background: linear-gradient(to right, #2c2826, #000000);
     padding: 15px
 }
 
+.field-container h3:hover {
+    background-color: rgb(114, 76, 76);
+}
 
 /* ending field.js style */
+
+@media(max-width:790px) {
+    
+    .config-box {
+        width: 415px;
+        height: 205px;
+    }
+
+}
+
+@media(max-width:640px) {
+    
+    .config-box {
+        width: 350px;
+        height: 180px;
+        margin: 20px 15px 15px 15px;
+    }
+
+}
+
+
+.question-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.question-box {
+    width: 730px;
+    height: 435px;
+    /* background-color: #fff; */
+    margin-top: 30px;
+    margin-bottom: 40px;
+    border-radius: 15px;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
+    /* display: flex; */
+    /* justify-content: center; */
+    /* align-items: center; */
+    animation: pop-in 0.5s forwards;
+}
+
+.question {
+    font-size: 24px;
+    text-align: center;
+    margin-top: 30px;
+    color: white;
+    opacity: 0;
+    animation: fade-in-for-question 0.5s forwards 0.5s;
+}
+
+.ex-start-holder {
+    margin-top: 100px;
+    text-align: center;
+}
+
+.ex-start {
+    /* margin-top: 90px; */
+    color: white;
+    background-color: rgb(111 40 40);
+    border: none;
+    background: linear-gradient(to right, #ff4830, #fc5000);
+    font-size: 18px;
+    width: 185px;
+    height: 35px;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease 0s;
+    opacity: 0;
+    animation: fade-in-for-start 0.5s forwards 0.9s;
+}
+
+.ex-start:hover {
+    box-shadow: 0px 15px 20px rgba(212, 72, 7, 0.4);
+    transform: translateY(-3px);
+}
+
+.ex-next-holder {
+    margin-top: 75px;
+    margin-left: 430px;
+    text-align: center;
+}
+
+.ex-next {
+    color: white;
+    background-color: rgb(111 40 40); /*backup color*/
+    border: none;
+    background: linear-gradient(to right, #780a00, #932f00);
+    font-size: 18px;
+    width: 185px;
+    height: 35px;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease 0s;
+    opacity: 0;
+    animation: fade-in-for-next 0.5s forwards 1.3s;
+}
+
+.ex-next:hover {
+    box-shadow: 0px 15px 20px rgba(212, 72, 7, 0.4);
+    transform: translateY(-3px);
+}
+
+.icons-holder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    margin: 20px;
+    opacity: 0;
+    animation: fade-in-for-question 0.5s forwards 0.5s;
+}
+
+.icons-holder i {
+    color: white;
+    font-size: 20px;
+    margin-left: 18px;
+}
+
+@keyframes pop-in {
+    0% {
+    transform: scale(0.5);
+    opacity: 0;
+    }
+    100% {
+    transform: scale(1);
+    opacity: 1;
+    }
+}
+
+@keyframes fade-in-for-question {
+    0% {
+    opacity: 0;
+    }
+    100% {
+    opacity: 1;
+    }
+}
+
+@keyframes fade-in-for-start {
+    0% {
+    opacity: 0;
+    }
+    100% {
+    opacity: 1;
+    }
+}
+
+@keyframes fade-in-for-next {
+    0% {
+    opacity: 0;
+    }
+    100% {
+    opacity: 1;
+    }
+}
+
+.clicked i {
+    color: red;
+}
+
+.link-container-for-example-page {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.link-container-for-interview-page {
+    margin-bottom: 35px;
+    margin-top: 35px;
+}
+
+.logo-name-for-interview {
+    color: black;
+}
+
+.icons-for-interview i {
+    color: red;
+}
+
+.instructions-parent-for-interview {
+    border-top: 5px solid black;
+    background: linear-gradient(to right, #2c2826, #000000);
+}
+
+.question-box-for-interview {
+    box-shadow: 0 0 30px rgb(111 40 40);
+}
+
+.report-title {
+    font-size: 25px;
+}
+
+.report-container {
+    height: 600px;
+}
+
+@media(max-width:800px) {
+    .question-box {
+        width: 560px;
+    }
+    .ex-next-holder {
+        margin-top: 75px;
+        margin-left: 320px;
+    }
+    .ex-next {
+        font-size: 16px;
+        width: 160px;
+        height: 35px;
+    }
+    .ex-start {
+        font-size: 16px;
+        width: 160px;
+        height: 35px;
+    }
+    .question {
+        font-size: 21px;
+    }
+    .button-start {
+        width: 200px;
+    }
+}
+
+@media(max-width:650px) {
+    .question-box {
+        width: 470px;
+    }
+    .ex-next-holder {
+        margin-left: 230px;
+    }
+    .main-title-2 {
+        font-size: 17px;
+    }    
+    .question {
+        font-size: 19px;
+    }
+    .button-start {
+        width: 185px;
+    }
+}
+
+
+
+
+
+
+
+
 
 
 

@@ -1,6 +1,12 @@
+import React, { useEffect } from 'react';
 import { Link } from "react-router-dom"
 
+
 const Config = () => {
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+        }, []);
 
     return (
 
@@ -8,9 +14,9 @@ const Config = () => {
         <>
 
 
-            <div className="logo-container-for-config" id="page-top" >
+            <div className="logo-container-for-config" >
                 <div className="top-logo-menu-for-config" >
-                    <a className="logo-name-for-config" href="#page-top" >VMI</a>
+                    <a className="logo-name-for-config" href="/" >VMI</a>
                 </div>
             </div>
 
