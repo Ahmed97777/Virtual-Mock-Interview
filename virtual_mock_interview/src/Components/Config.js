@@ -1,15 +1,17 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect, useRef} from 'react';
 import { Link } from "react-router-dom"
-
+import Webcam from "react-webcam";
 
 const Config = () => {
+    const webcamRef = useRef(null);
+    const audioFlag = false
 
-    useEffect(() => {
-        window.scrollTo(0, 0);
-        }, []);
+    const [hasUserMediaError, setHasUserMediaError] = useState(false);
+    const onUserMediaError = () => {
+        setHasUserMediaError(true);
+    }
 
     return (
-
 
         <>
 
@@ -38,14 +40,13 @@ const Config = () => {
 
             <div className="config-container">
                 <div className="config-box">
-                    <img src="/video-logo-removebg-preview.png" alt="Video Logo" className="config-img" ></img>
-                    <p>No Video URL</p>
+                {hasUserMediaError ? (
+                    <img src="/video-logo-removebg-preview.png" alt="no video" className="config-img" />
+                ) : (
+                    <Webcam className= "web-cam" audio={audioFlag} ref={webcamRef} onUserMediaError={onUserMediaError} />
+                )}
                 </div>
-                <div className="config-box">
-                    <img src="/audio-logo-removebg-preview.png" alt="Mic Logo" className="config-img" ></img>
-                    <p>No Audio URL</p>
-                </div>
-                <Link to="/field" ><button className="button-start" >Next <span className="triangle"></span></button></Link>
+                <Link to="/field"><button className="button-start" >Next <span className="triangle"></span></button></Link>
             </div>
 
 
@@ -56,10 +57,7 @@ const Config = () => {
         
         
         </>
-
-        
-
-    )
+    );
 
 }
 

@@ -423,8 +423,8 @@ background: linear-gradient(to right, #2c2826, #000000);
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    width: 525px;
-    height: 265px;
+    width: 720px;
+    height: 480px;
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 15px;
     margin: 0 15px 15px 15px;
@@ -432,6 +432,12 @@ background: linear-gradient(to right, #2c2826, #000000);
     /* background-color: rgba(0, 0, 0, 0.1); */
     transition: 0.3s;
     cursor: pointer;
+}
+.web-cam{
+    width: 99%;
+    height: 99%;
+    object-fit: cover;
+    border-radius: 10px;
 }
 
 .example {
