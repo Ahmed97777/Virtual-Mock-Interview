@@ -1,1 +1,3 @@
 /venv
+/app.config
+__pycache__
