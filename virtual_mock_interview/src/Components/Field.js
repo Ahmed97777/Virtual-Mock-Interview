@@ -7,6 +7,16 @@ const Field = () => {
         window.scrollTo(0, 0);
         }, []);
 
+
+
+        const handleButtonClick = (e) => {
+            console.log(e.target.id);
+        };
+
+
+
+
+
     return (
 
         <>
@@ -38,17 +48,21 @@ const Field = () => {
                 
                 <div className="field-container" >
                     
-                        <h3>Software Engineering 1</h3>
-                        <h3>Field 1</h3>
-                        <h3>Software Engineering 2</h3>
-                        <h3>Field 1</h3>
-                        <h3>Field 1</h3>
-                        <h3>Field 1</h3>
-                        <h3>Field 1</h3>
-                        <h3>Field 1</h3>
-                        <h3>Field 1</h3>
-                        <h3>Software Engineering 3</h3>
-                    
+
+
+                        <button id='soft-en' onClick={handleButtonClick}>Software Engineering</button>
+                        <button id='elec-en' onClick={handleButtonClick}>Electrical Engineering</button>
+                        <button id='mecha-en' onClick={handleButtonClick}>Mechanical Engineering</button>
+                        <button id='auto-en' onClick={handleButtonClick}>Automation Engineering</button>
+                        <button id='code-g' onClick={handleButtonClick}>Coding General</button>
+                        <button id='jun-web' onClick={handleButtonClick}>Junior Web Development</button>
+                        <button id='sen-web' onClick={handleButtonClick}>Senior Web Development</button>
+                        <button id='frs-web' onClick={handleButtonClick}>Fresh Web Development</button>
+                        <button id='frs-mob' onClick={handleButtonClick}>Fresh Mobile Development</button>
+                        <button id='sen-mob' onClick={handleButtonClick}>Senior Mobile Development</button>
+                        <button id='jun-mob' onClick={handleButtonClick}>Junior Mobile Development</button>
+                        <button id='game-dev' onClick={handleButtonClick}>Game Development</button>
+                        
                     
                 </div>
 

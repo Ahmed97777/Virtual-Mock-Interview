@@ -481,16 +481,18 @@ background-color: var(--background-color); /* Fallback color */
     transition: 0.3s;
 }
 
-.field-container h3 {
+.field-container button {
     border: 1px solid var(--front-color);
     border-radius: 15px;
+    background-color: var(--background-color);
     text-align: center;
+    font-weight: 600;
     margin-right: 15px;
     margin-bottom: 15px;
     padding: 15px
 }
 
-.field-container h3:hover {
+.field-container button:hover {
     background-color: rgba(0, 179, 255, 0.4);
 }
 
