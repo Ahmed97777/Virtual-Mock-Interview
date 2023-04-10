@@ -502,6 +502,10 @@ background-color: var(--background-color); /* Fallback color */
     background-color: rgba(0, 179, 255, 0.4);
 }
 
+.activeField {
+    color: rgb(0, 255, 221);
+}
+
 /* ending field.js style */
 
 @media(max-width:790px) {
