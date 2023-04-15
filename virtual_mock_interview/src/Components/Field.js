@@ -1,9 +1,13 @@
 import React, { useEffect } from 'react';
 import { useState } from 'react';
 import { Link } from "react-router-dom"
+import axios from "axios";
 
 const Field = () => {
-
+    const client = axios.create({
+        baseURL: "http://127.0.0.1:5000"
+     });
+     
     useEffect(() => {
         window.scrollTo(0, 0);
         }, []);
@@ -14,9 +18,18 @@ const Field = () => {
             setChoosenField(event.target.id);
         };
 
-        const printChoosenField = () => {
-            console.log(choosenField);
-        };
+        const sendToBackEnd = () => {
+            const endpoint = "/field";
+            client.post(endpoint, {'field': choosenField})
+            .then(response => {
+            console.log('Success:', response);
+            // Handle success response here, such as displaying a success message to the user
+            })
+            .catch(error => {
+            console.error('Error:', error);
+            // Handle error response here, such as displaying an error message to the user
+            });
+            };
 
 
     return (
@@ -61,7 +74,7 @@ const Field = () => {
                     
                 </div>
 
-                <Link to="/example-case" ><button className="button-start" onClick={printChoosenField}>Next <span className="triangle"></span></button></Link>
+                <Link to="/example-case" ><button className="button-start" onClick={sendToBackEnd}>Next <span className="triangle"></span></button></Link>
             </div>
 
             {/* Ending the configuration process */}
