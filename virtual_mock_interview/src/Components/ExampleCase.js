@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useEffect } from 'react';
 import { Link } from "react-router-dom"
+import axios from "axios";
 
 const ExampleCase = () => {
 
@@ -12,6 +13,21 @@ const ExampleCase = () => {
     const handleClick = () => {
         setIsClicked(true);
     }
+
+    const client = axios.create({
+        baseURL: "http://127.0.0.1:5000/softwareQuestions"
+    });
+
+
+    const [posts, setPosts] = useState([]);
+
+    useEffect(() => {
+        client.get('?_limit=10').then((response) => {
+            setPosts(response.data);
+        });
+        }, []);
+
+
 
     return (
 

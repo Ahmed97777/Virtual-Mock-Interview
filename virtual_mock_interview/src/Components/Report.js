@@ -1,12 +1,26 @@
 import React, { useEffect } from 'react';
+import { useState } from 'react'
 // import { Link } from "react-router-dom"
-
+import axios from "axios";
 
 const Report = () => {
 
     useEffect(() => {
         window.scrollTo(0, 0);
         }, []);
+
+        const client = axios.create({
+            baseURL: "http://127.0.0.1:5000/softwareQuestions"
+        });
+    
+    
+        const [posts, setPosts] = useState([]);
+    
+        useEffect(() => {
+            client.get('').then((response) => {
+                setPosts(response.data);
+            });
+            }, []);
 
     return (
 
