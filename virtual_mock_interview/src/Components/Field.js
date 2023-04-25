@@ -19,8 +19,17 @@ const Field = () => {
         };
 
         const sendToBackEnd = () => {
-            const endpoint = "/field";
-            client.post(endpoint, {'field': choosenField})
+            const endpoint = "/questions";
+            client.get(endpoint, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json'
+                },
+                params:{
+                    job_field: choosenField
+                },
+                data:{}
+            })
             .then(response => {
             console.log('Success:', response);
             // Handle success response here, such as displaying a success message to the user
@@ -30,6 +39,7 @@ const Field = () => {
             // Handle error response here, such as displaying an error message to the user
             });
             };
+            
 
 
     return (
