@@ -10,6 +10,7 @@ import Field from "./Components/Field";
 import ExampleCase from "./Components/ExampleCase";
 import Interview from "./Components/Interview";
 import Report from "./Components/Report";
+import VideoApi from "./Components/VideoApi";
 
 
 function App() {
@@ -27,7 +28,8 @@ function App() {
           <Route  path="/field" element= {<Field/>} />
           <Route  path="/example-case" element= {<ExampleCase/>} />
           <Route  path="/interview" element= {<Interview/>} />
-          <Route  path="/report" element= {<Report/>} />
+          {/* <Route  path="/report" element= {<Report/>} /> */}
+          <Route  path="/report" element= {<VideoApi/>} />
           <Route  path="*" element= {<div><Header/><NotFound/></div>} />
 
         </Routes>

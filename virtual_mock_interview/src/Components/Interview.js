@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useState } from 'react';
 import { Link } from "react-router-dom"
-import axios from "axios";
+// import axios from "axios";
 
 const Interview = () => {
 
@@ -14,7 +14,7 @@ const Interview = () => {
         "why are you here right now?"
     ]
 
-
+    
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const currentQuestion = questionsArray[currentQuestionIndex];
 
@@ -59,7 +59,7 @@ const Interview = () => {
 
 
     return (
-
+        
         <>
 
             <div className="logo-container-for-config" >
