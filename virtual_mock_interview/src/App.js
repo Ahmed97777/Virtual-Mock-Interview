@@ -28,8 +28,9 @@ function App() {
           <Route  path="/field" element= {<Field/>} />
           <Route  path="/example-case" element= {<ExampleCase/>} />
           <Route  path="/interview" element= {<Interview/>} />
-          {/* <Route  path="/report" element= {<Report/>} /> */}
-          <Route  path="/report" element= {<VideoApi/>} />
+          <Route  path="/report" element= {<Report/>} />
+          {/* just for test */}
+          {/* <Route  path="/report" element= {<VideoApi/>} /> */} 
           <Route  path="*" element= {<div><Header/><NotFound/></div>} />
 
         </Routes>

@@ -62,7 +62,7 @@ const ExampleCase = () => {
                 </div>
 
                 <div className='link-container-for-example-page' >
-                    <Link to="/interview" ><button className="button-start" >Begin Interview <span className="triangle"></span></button></Link>
+                    <Link to="/interview" ><button className="button-start" >Go to Interview page <span className="triangle"></span></button></Link>
                 </div>
 
 

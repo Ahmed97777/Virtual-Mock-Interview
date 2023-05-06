@@ -669,6 +669,11 @@ background-color: var(--background-color); /* Fallback color */
     color: red;
 }
 
+.icons-for-interview.clicked i {
+    color: red;
+}
+
+
 .link-container-for-example-page {
     display: flex;
     justify-content: center;
@@ -685,7 +690,7 @@ background-color: var(--background-color); /* Fallback color */
 }
 
 .icons-for-interview i {
-    color: red;
+    color: white;
 }
 
 .instructions-parent-for-interview {

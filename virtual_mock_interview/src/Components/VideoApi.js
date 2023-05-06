@@ -61,11 +61,13 @@ const VideoApi = () => {
     return (
     <>
         <Webcam audio={true} ref={webcamRef} />
+
         {capturing ? (
         <button onClick={handleStopCaptureClick}>Stop Capture</button>
         ) : (
         <button onClick={handleStartCaptureClick}>Start Capture</button>
         )}
+        
         {recordedChunks.length > 0 && (
         <button onClick={handleSendToBackend}>Send to Backend</button>
         )}

@@ -1,10 +1,11 @@
 import React, { useEffect } from 'react';
 import { useState } from 'react';
 import { Link } from "react-router-dom"
-// import axios from "axios";
+import axios from "axios";
+import Webcam from "react-webcam";
+
 
 const Interview = () => {
-
 
     const questionsArray = [
         "how are you?",
@@ -14,19 +15,116 @@ const Interview = () => {
         "why are you here right now?"
     ]
 
-    
+
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-    const currentQuestion = questionsArray[currentQuestionIndex];
+    const [showFirstQuestion, setShowFirstQuestion] = useState(false);
+    const currentQuestion = showFirstQuestion ? questionsArray[currentQuestionIndex] : '';
 
 
     const sendAndChange = () => {
-        
         setCurrentQuestionIndex(currentQuestionIndex + 1);
-
-
     }
 
+    const sendAndChange2 = () => {
+        setShowFirstQuestion(true);
+    }
 
+    const [counter, setCounter] = useState(0);
+    const [buttonText, setButtonText] = useState('Start Interview');
+
+    const [isClicked, setIsClicked] = useState(false);
+    const handleClick = () => {
+        setIsClicked(true);
+        console.log(isClicked);
+    }
+
+    // ------------------------------------------------------------
+    // ------------------------------------------------------------
+    // ------------------------------------------------------------
+
+    const webcamRef = React.useRef(null);
+    const mediaRecorderRef = React.useRef(null);
+    const [capturing, setCapturing] = React.useState(false);
+    const [recordedChunks, setRecordedChunks] = React.useState([]);
+
+    const handleStartCaptureClick = React.useCallback(() => {
+        setCapturing(true);
+        mediaRecorderRef.current = new MediaRecorder(webcamRef.current.stream, {
+        mimeType: "video/webm;codecs=vp9,opus"
+    });
+        mediaRecorderRef.current.addEventListener(
+            "dataavailable",
+            handleDataAvailable
+        );
+        mediaRecorderRef.current.start();
+    }, [webcamRef, setCapturing, mediaRecorderRef]);
+    
+    
+    const handleDataAvailable = React.useCallback(({ data }) => {
+    if (data.size > 0) {
+        setRecordedChunks((prev) => prev.concat(data));
+    }
+    }, []);
+
+    const handleStopCaptureClick = React.useCallback(() => {
+        mediaRecorderRef.current.stop();
+        setCapturing(false);
+    }, [mediaRecorderRef, webcamRef, setCapturing]);
+        
+        
+    const handleSendToBackend = React.useCallback(() => {
+    if (recordedChunks.length) {
+    const blob = new Blob(recordedChunks, {
+        type: "video/webm"
+    });
+    const formData = new FormData();
+    formData.append("video", blob, "react-webcam-stream-capture.webm");
+    axios.post("/api/upload-video", formData)
+        .then(response => {
+        // Handle the response from the backend
+        })
+        .catch(error => {
+        // Handle the error
+        });
+    setRecordedChunks([]);
+    }
+    }, [recordedChunks]);
+
+
+    
+
+    function MajorFunction() {
+
+            
+        
+            if (counter === 0) {
+                handleClick();
+                sendAndChange2();
+                // start record
+                setCounter(counter + 1);
+                setButtonText('Next Question');
+                console.log(counter);
+            } else if (counter === 4) {
+                sendAndChange();
+                // stop record + send to backened + start tany
+                setButtonText('End Interview');
+                setCounter(counter + 1);
+                console.log(counter);
+            }else if (counter === 5) {
+                // do something when counter is 5
+                // stop record + send to backend + go to report page
+                
+            } else {
+                // stop record + send to backened + start tany
+                sendAndChange();
+                setCounter(counter + 1);
+                console.log(counter);
+            }
+        
+    
+        // rest of your code here
+    }
+    
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -55,12 +153,16 @@ const Interview = () => {
         //     });
         //     }
 
+        
             
 
 
     return (
         
         <>
+
+            {/* <Webcam audio={true} ref={webcamRef} /> */}
+
 
             <div className="logo-container-for-config" >
                 <div className="top-logo-menu-for-config" >
@@ -71,38 +173,35 @@ const Interview = () => {
             <div className="instructions-parent instructions-parent-for-interview" >
                 
                 <div className="instructions-container" >
-                    <h2 className="main-title-2" >Interview Started:</h2>
+                    {/* <h2 className="main-title-2" >Interview Started:</h2> */}
                 </div>
 
 
 
                 <div className="question-container">
                     <div className="question-box question-box-for-interview">
-                        <div className="icons-holder icons-for-interview">
+                        <div className={`icons-holder icons-for-interview  ${isClicked ? 'clicked' : ''}`}>
                             <i className="fas fa-video"></i>
                             <i className="fas fa-microphone"></i>
                         </div>
-                        <div className="question" id='questionId'>{currentQuestion}</div>
-                        <div className='ex-start-holder' ><button className="ex-start" >Start Answer </button></div>
-                        <div className='ex-next-holder' ><button className="ex-next" onClick={sendAndChange} >Next question </button></div>
+                        <div className="question" id='questionId' style={{ display: showFirstQuestion ? 'block' : 'none' }}>{currentQuestion}</div>
+                            {/* <div className='ex-start-holder' ><button className="ex-start" onClick={sendAndChange2} >Start Answer </button></div> */}
+                            {/* <div className='ex-next-holder' ><button className="ex-next" onClick={sendAndChange} >Next question </button></div> */}
+                            {/* <div className="question" id='questionId'>{currentQuestion}</div>
+                            <div className='ex-start-holder' ><button className="ex-start" >Start Answer </button></div>
+                            <div className='ex-next-holder' ><button className="ex-next" onClick={sendAndChange} >Next question </button></div> */}
                     </div>
                 </div>
 
                 <div className='link-container-for-example-page link-container-for-interview-page' >
-                    <Link to="/report" ><button className="button-start" >End Interview <span className="triangle"></span></button></Link>
+                    <button className="button-start" onClick={MajorFunction} >{buttonText} <span className="triangle"></span></button>
                 </div>
 
 
+                {/* <Link to="/report" ><button className="button-start" >Start Interview <span className="triangle"></span></button></Link> */}
 
 
             </div>
-        
-        
-        
-        
-        
-        
-        
         
         
         </>
