@@ -1,11 +1,14 @@
 import React, { useEffect } from 'react';
 import { useState } from 'react';
 import { Link } from "react-router-dom"
+import {useNavigate} from 'react-router-dom';
 import axios from "axios";
 import Webcam from "react-webcam";
 
 
 const Interview = () => {
+
+    const navigate = useNavigate();
 
     const questionsArray = [
         "how are you?",
@@ -35,7 +38,7 @@ const Interview = () => {
     const [isClicked, setIsClicked] = useState(false);
     const handleClick = () => {
         setIsClicked(true);
-        console.log(isClicked);
+        // console.log(isClicked);
     }
 
     // ------------------------------------------------------------
@@ -90,33 +93,77 @@ const Interview = () => {
     }
     }, [recordedChunks]);
 
+    // ------------------------------------------------------------
+    // ------------------------------------------------------------
+    // ------------------------------------------------------------
 
+    const firstStartCapturing = () => {
+        if (capturing) {
+            handleStopCaptureClick();
+        }
+        handleStartCaptureClick();
+        console.log("First recording started");
+    };
+
+    const nextQuestionCapturing = async () => {
+        if (capturing) {
+            handleStopCaptureClick();
+            console.log("Recording stopped");
+            await handleSendToBackend();
+            console.log("Recording sent to backend");
+        }
+        handleStartCaptureClick();
+        console.log("new question Recording started");
+    };
+
+
+    const lastQuestionCapturing = async () => {
+        if (capturing) {
+            handleStopCaptureClick();
+            console.log("last question Recording stopped");
+            await handleSendToBackend();
+            console.log("last question Recording sent to backend");
+            // return <Link to="/report">Go to Report</Link>;
+            navigate('/report');
+        }
+    };
+    
+    // ------------------------------------------------------------
+    // ------------------------------------------------------------
+    // ------------------------------------------------------------
+    
     
 
     function MajorFunction() {
 
-            
-        
             if (counter === 0) {
                 handleClick();
                 sendAndChange2();
                 // start record
+                firstStartCapturing();
                 setCounter(counter + 1);
                 setButtonText('Next Question');
                 console.log(counter);
             } else if (counter === 4) {
                 sendAndChange();
-                // stop record + send to backened + start tany
                 setButtonText('End Interview');
+                // stop record + send to backened + start tany
+                nextQuestionCapturing();
                 setCounter(counter + 1);
                 console.log(counter);
             }else if (counter === 5) {
                 // do something when counter is 5
+                // console.log("this is counter 5 baby");
                 // stop record + send to backend + go to report page
+                // stop record + send to backened
+                lastQuestionCapturing();
+                // Navigate to report page
                 
+
             } else {
-                // stop record + send to backened + start tany
                 sendAndChange();
+                // stop record + send to backened + start tany
+                nextQuestionCapturing();
                 setCounter(counter + 1);
                 console.log(counter);
             }
@@ -162,6 +209,7 @@ const Interview = () => {
         <>
 
             {/* <Webcam audio={true} ref={webcamRef} /> */}
+            <Webcam audio={true} ref={webcamRef} style={{ display: 'none' }} />
 
 
             <div className="logo-container-for-config" >
@@ -199,6 +247,7 @@ const Interview = () => {
 
 
                 {/* <Link to="/report" ><button className="button-start" >Start Interview <span className="triangle"></span></button></Link> */}
+
 
 
             </div>
