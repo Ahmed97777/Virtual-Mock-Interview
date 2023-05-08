@@ -38,7 +38,6 @@ const Interview = () => {
     const [isClicked, setIsClicked] = useState(false);
     const handleClick = () => {
         setIsClicked(true);
-        // console.log(isClicked);
     }
 
     // ------------------------------------------------------------
@@ -76,30 +75,31 @@ const Interview = () => {
         
         
     const handleSendToBackend = React.useCallback(() => {
-    if (recordedChunks.length) {
-    const blob = new Blob(recordedChunks, {
-        type: "video/webm"
-    });
-    const formData = new FormData();
-    formData.append("video", blob, "react-webcam-stream-capture.webm");
-    axios.post("/api/upload-video", formData)
-        .then(response => {
-        // Handle the response from the backend
-        })
-        .catch(error => {
-        // Handle the error
+        if (recordedChunks.length) {
+        const blob = new Blob(recordedChunks, {
+            type: "video/webm"
         });
-    setRecordedChunks([]);
-    }
+        const formData = new FormData();
+        formData.append("video", blob, String((counter - 1)+"video.webm"));
+        axios.post("http://127.0.0.1:5000/video", formData)
+            .then(response => {
+            // Handle the response from the backend
+            })
+            .catch(error => {
+            // Handle the error
+            });
+        setRecordedChunks([]);
+        }
     }, [recordedChunks]);
 
     // ------------------------------------------------------------
     // ------------------------------------------------------------
     // ------------------------------------------------------------
-
+    // i = 0 
     const firstStartCapturing = () => {
         if (capturing) {
             handleStopCaptureClick();
+            console.log("capturing is set to true");
         }
         handleStartCaptureClick();
         console.log("First recording started");
@@ -109,7 +109,7 @@ const Interview = () => {
         if (capturing) {
             handleStopCaptureClick();
             console.log("Recording stopped");
-            await handleSendToBackend();
+            handleSendToBackend();
             console.log("Recording sent to backend");
         }
         handleStartCaptureClick();
@@ -121,7 +121,7 @@ const Interview = () => {
         if (capturing) {
             handleStopCaptureClick();
             console.log("last question Recording stopped");
-            await handleSendToBackend();
+            handleSendToBackend();
             console.log("last question Recording sent to backend");
             // return <Link to="/report">Go to Report</Link>;
             navigate('/report');
@@ -151,7 +151,7 @@ const Interview = () => {
                 nextQuestionCapturing();
                 setCounter(counter + 1);
                 console.log(counter);
-            }else if (counter === 5) {
+            }else if (counter === 6) {
                 // do something when counter is 5
                 // console.log("this is counter 5 baby");
                 // stop record + send to backend + go to report page
@@ -176,29 +176,6 @@ const Interview = () => {
     useEffect(() => {
         window.scrollTo(0, 0);
         }, []);
-
-        // const client = axios.create({
-        //     baseURL: "http://127.0.0.1:5000"
-        // });
-
-        // const [videoFile, setVideoFile] = useState([]);
-
-        // const addToArray = () => {
-        //     setVideoFile(prev => [...prev, videoFile]);
-        //     };
-
-        //     const sendToBackEnd = () => {
-        //     const endpoint = "/field";
-        //     client.post(endpoint, {'field': videoFile})
-        //     .then(response => {
-        //     console.log('Success:', response);
-        //     // Handle success response here, such as displaying a success message to the user
-        //     })
-        //     .catch(error => {
-        //     console.error('Error:', error);
-        //     // Handle error response here, such as displaying an error message to the user
-        //     });
-        //     }
 
         
             
