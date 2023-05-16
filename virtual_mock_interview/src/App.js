@@ -10,7 +10,6 @@ import Field from "./Components/Field";
 import ExampleCase from "./Components/ExampleCase";
 import Interview from "./Components/Interview";
 import Report from "./Components/Report";
-import VideoApi from "./Components/VideoApi";
 
 
 function App() {
