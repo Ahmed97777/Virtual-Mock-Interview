@@ -140,7 +140,7 @@ background-color: var(--background-color); /* Fallback color */
 
 .landing .intro-text p {
     margin: 0;
-    color: #264996;
+    color: black;
     margin-top: 20px;
     font-size: 17px;
     line-height: 1.8;
@@ -220,6 +220,7 @@ background-color: var(--background-color); /* Fallback color */
 .main-content p {
     font-size: 16px;
     max-width: 650px;
+    color: black;
 }
 
 @media(max-width:1130px) {
@@ -363,13 +364,13 @@ background-color: var(--background-color); /* Fallback color */
 }
 
 .footer span {
-    color: var(--background-color);
+    color: black;
     font-weight: bold;
 }
 
 .footer a {
     text-decoration: none;
-    color: var(--background-color);
+    color: black;
     font-weight: bold;
 }
 
@@ -496,15 +497,17 @@ background-color: var(--background-color); /* Fallback color */
     font-weight: 600;
     margin-right: 15px;
     margin-bottom: 15px;
-    padding: 15px
+    padding: 15px;
+    transition: 0.2s;
 }
 
 .field-container button:hover {
-    color: #264996;
+    /* color: #264996; */
+    background-color: #264996
 }
 
 .activeField {
-    color: white;
+    background-color: #264996 !important;
 }
 
 /* ending field.js style */

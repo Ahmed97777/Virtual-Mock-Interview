@@ -57,7 +57,7 @@ const Field = () => {
             
                 <div className="instructions-container" >
                     <h2 className="main-title-2" >How to start the interview:</h2>
-                    <h2 className="main-title-2" >2- Please choose field:</h2>
+                    <h2 className="main-title-2" >2- Please choose a field:</h2>
                 </div>
 
             </div>

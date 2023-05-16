@@ -160,43 +160,59 @@ const Interview = () => {
     // ------------------------------------------------------------
     // ------------------------------------------------------------
     
-    
+
+
 
     function MajorFunction() {
 
             if (counter === 0) {
                 firstStartCapturing();
-                setTimeout(() => {
-                    handleClick();
+                handleClick();
                     sendAndChange2();
                     setCounter(counter + 1);
                     setButtonText('Next Question');
                     console.log(counter);
-                }, 5000);
-                
                 // start record
                 
                 
             } else if (counter === 4) {
+                nextQuestionCapturing();
                 sendAndChange();
                 setButtonText('End Interview');
                 // stop record + send to backened + start tany
-                nextQuestionCapturing();
+                
                 setCounter(counter + 1);
                 console.log(counter);
-            }else if (counter === 6) {
+            }
+            else if (counter === 5) {
                 // do something when counter is 5
                 // console.log("this is counter 5 baby");
                 // stop record + send to backend + go to report page
                 // stop record + send to backened
-                lastQuestionCapturing();
+                nextQuestionCapturing();
+                sendAndChange();
+                setButtonText('To Report Page');
+                setCounter(counter + 1);
+                console.log(counter);
                 // Navigate to report page
                 
-
-            } else {
+            }
+            else if (counter === 6) {
+                // do something when counter is 5
+                // console.log("this is counter 5 baby");
+                // stop record + send to backend + go to report page
+                // stop record + send to backened
+                console.log("i am in counter 6")
+                lastQuestionCapturing();
+                sendAndChange();
+                // Navigate to report page
+                
+            }
+            else {
+                nextQuestionCapturing();
                 sendAndChange();
                 // stop record + send to backened + start tany
-                nextQuestionCapturing();
+                
                 setCounter(counter + 1);
                 console.log(counter);
             }

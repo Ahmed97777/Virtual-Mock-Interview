@@ -43,7 +43,7 @@ const ExampleCase = () => {
             <div className="instructions-parent" >
                 
                 <div className="instructions-container" >
-                    <h2 className="main-title-2" >How to start the interview:</h2>
+                    <h2 className="main-title-2" >Example on how to start the interview:</h2>
                     <h2 className="main-title-2" >3- Answer questions as shown below:</h2>
                 </div>
 
