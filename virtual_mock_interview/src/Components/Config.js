@@ -43,7 +43,7 @@ const Config = () => {
                 {hasUserMediaError ? (
                     <img src="/video-logo-removebg-preview.png" alt="no video" className="config-img" />
                 ) : (
-                    <Webcam className= "web-cam" audio={audioFlag} ref={webcamRef} onUserMediaError={onUserMediaError} />
+                    <Webcam className= "web-cam" audio={audioFlag}  ref={webcamRef} muted={true} onUserMediaError={onUserMediaError} />
                 )}
                 </div>
                 <Link to="/field"><button className="button-start" >Next <span className="triangle"></span></button></Link>
