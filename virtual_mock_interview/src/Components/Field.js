@@ -16,6 +16,7 @@ const Field = () => {
 
         const handleButtonClick = (event) => {
             setChoosenField(event.target.id);
+            console.log(event.target.id);
         };
 
         const sendToBackEnd = () => {
@@ -68,18 +69,20 @@ const Field = () => {
                 <div className="field-container" >
                     
 
-                    <button id='soft-en' onClick={handleButtonClick} className={choosenField === 'soft-en' ? 'activeField' : ''}>Software Engineering</button>
-                    <button id='elec-en' onClick={handleButtonClick} className={choosenField === 'elec-en' ? 'activeField' : ''}>Electrical Engineering</button>
-                    <button id='mecha-en' onClick={handleButtonClick} className={choosenField === 'mecha-en' ? 'activeField' : ''}>Mechanical Engineering</button>
-                    <button id='auto-en' onClick={handleButtonClick} className={choosenField === 'auto-en' ? 'activeField' : ''}>Automation Engineering</button>
-                    <button id='code-g' onClick={handleButtonClick} className={choosenField === 'code-g' ? 'activeField' : ''}>Coding General</button>
-                    <button id='jun-web' onClick={handleButtonClick} className={choosenField === 'jun-web' ? 'activeField' : ''}>Junior Web Development</button>
-                    <button id='sen-web' onClick={handleButtonClick} className={choosenField === 'sen-web' ? 'activeField' : ''}>Senior Web Development</button>
-                    <button id='frs-web' onClick={handleButtonClick} className={choosenField === 'frs-web' ? 'activeField' : ''}>Fresh Web Development</button>
-                    <button id='frs-mob' onClick={handleButtonClick} className={choosenField === 'frs-mob' ? 'activeField' : ''}>Fresh Mobile Development</button>
-                    <button id='sen-mob' onClick={handleButtonClick} className={choosenField === 'sen-mob' ? 'activeField' : ''}>Senior Mobile Development</button>
-                    <button id='jun-mob' onClick={handleButtonClick} className={choosenField === 'jun-mob' ? 'activeField' : ''}>Junior Mobile Development</button>
-                    <button id='game-dev' onClick={handleButtonClick} className={choosenField === 'game-dev' ? 'activeField' : ''}>Game Development</button>
+                    <button id='Junior-Software-Engineer' onClick={handleButtonClick} className={choosenField === 'Junior-Software-Engineer' ? 'activeField' : ''}>Junior Software Engineer</button>
+                    <button id='Electrical-Engineer' onClick={handleButtonClick} className={choosenField === 'Electrical-Engineer' ? 'activeField' : ''}>Electrical Engineering</button>
+                    <button id='Junior-Automation-Engineer' onClick={handleButtonClick} className={choosenField === 'Junior-Automation-Engineer' ? 'activeField' : ''}>Junior Automation Engineer</button>
+                    <button id='Junior-Game-Developer' onClick={handleButtonClick} className={choosenField === 'Junior-Game-Developer' ? 'activeField' : ''}>Junior Game Developer</button>
+                    <button id='Junior-Frontend-Developer' onClick={handleButtonClick} className={choosenField === 'Junior-Frontend-Developer' ? 'activeField' : ''}>Junior Frontend Developer</button>
+                    <button id='Junior-Mobile-Development' onClick={handleButtonClick} className={choosenField === 'Junior-Mobile-Development' ? 'activeField' : ''}>Junior Mobile Development</button>
+                    <button id='Junior-Control-Engineer' onClick={handleButtonClick} className={choosenField === 'Junior-Control-Engineer' ? 'activeField' : ''}>Junior Control Engineer</button>
+                    <button id='Junior-Embedded-Engineer' onClick={handleButtonClick} className={choosenField === 'Junior-Embedded-Engineer' ? 'activeField' : ''}>Junior Embedded Engineer</button>
+                    <button id='Junior-Human-Resources' onClick={handleButtonClick} className={choosenField === 'Junior-Human-Resources' ? 'activeField' : ''}>Junior Human Resources</button>
+                    <button id='Junior-Project-Manager' onClick={handleButtonClick} className={choosenField === 'Junior-Project-Manager' ? 'activeField' : ''}>Junior-Project-Manager</button>
+                    <button id='Junior-Content-Creator' onClick={handleButtonClick} className={choosenField === 'Junior-Content-Creator' ? 'activeField' : ''}>Junior-Content-Creator</button>
+                    <button id='accountant' onClick={handleButtonClick} className={choosenField === 'accountant' ? 'activeField' : ''}>accountant</button>
+
+                    
                     
                     
                 </div>

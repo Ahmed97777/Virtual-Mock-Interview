@@ -137,13 +137,18 @@ const Interview = () => {
     function MajorFunction() {
 
             if (counter === 0) {
-                handleClick();
-                sendAndChange2();
-                // start record
                 firstStartCapturing();
-                setCounter(counter + 1);
-                setButtonText('Next Question');
-                console.log(counter);
+                setTimeout(() => {
+                    handleClick();
+                    sendAndChange2();
+                    setCounter(counter + 1);
+                    setButtonText('Next Question');
+                    console.log(counter);
+                }, 5000);
+                
+                // start record
+                
+                
             } else if (counter === 4) {
                 sendAndChange();
                 setButtonText('End Interview');
@@ -186,7 +191,7 @@ const Interview = () => {
         <>
 
             {/* <Webcam audio={true} ref={webcamRef} /> */}
-            <Webcam audio={true} ref={webcamRef} style={{ display: 'none' }} />
+            <Webcam audio={true} ref={webcamRef} muted={true} style={{ display: 'none' }} />
 
 
             <div className="logo-container-for-config" >

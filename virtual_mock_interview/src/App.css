@@ -500,13 +500,10 @@ background-color: var(--background-color); /* Fallback color */
 }
 
 .field-container button:hover {
-    
     color: #264996;
-    
 }
 
 .activeField {
-    background-color: #264996;
     color: white;
 }
 
