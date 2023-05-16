@@ -8,6 +8,32 @@ import Webcam from "react-webcam";
 
 const Interview = () => {
 
+    const client = axios.create({
+        baseURL: "http://127.0.0.1:5000"
+    });
+
+    useEffect(() => {
+            const endpoint = "/questions";
+            client.get(endpoint, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json'
+                },
+                params:{
+                    
+                },
+                data:{}
+            })
+            .then(response => {
+            console.log('Success:', response);
+            // Handle success response here, such as displaying a success message to the user
+            })
+            .catch(error => {
+            console.error('Error:', error);
+            // Handle error response here, such as displaying an error message to the user
+            });
+    }, []);
+
     const navigate = useNavigate();
 
     const questionsArray = [
