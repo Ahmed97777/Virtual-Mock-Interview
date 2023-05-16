@@ -53,6 +53,7 @@ const Interview = () => {
         setCapturing(true);
         mediaRecorderRef.current = new MediaRecorder(webcamRef.current.stream, {
         mimeType: "video/webm;codecs=vp9,opus"
+
     });
         mediaRecorderRef.current.addEventListener(
             "dataavailable",
@@ -102,6 +103,7 @@ const Interview = () => {
             console.log("capturing is set to true");
         }
         handleStartCaptureClick();
+
         console.log("First recording started");
     };
 
