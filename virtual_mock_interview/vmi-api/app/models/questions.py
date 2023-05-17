@@ -20,6 +20,16 @@ class Question(db.Model):
         # query random questions by the given field
         return cls.query.filter_by(field=field).order_by(func.random()).limit(limit).all()
     
+    # serialize question object
+    def serialize(self):
+        return {
+            'id': self.id,
+            'question_text': self.question_text,
+            'field': self.field,
+            'category': self.category,
+            'difficulty': self.difficulty
+        }
+    
 
     def __repr__(self):
         return '<Question:{}:{},   Field: {},  category: {},  difficulty: {}>'.format(self.id, self.question_text, self.field, self.category, self.difficulty)
