@@ -14,20 +14,6 @@ const ExampleCase = () => {
         setIsClicked(true);
     }
 
-    const client = axios.create({
-        baseURL: "http://127.0.0.1:5000/softwareQuestions"
-    });
-
-
-    const [posts, setPosts] = useState([]);
-
-    useEffect(() => {
-        client.get('?_limit=10').then((response) => {
-            setPosts(response.data);
-        });
-        }, []);
-
-
 
     return (
 

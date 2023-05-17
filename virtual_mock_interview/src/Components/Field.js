@@ -1,48 +1,24 @@
 import React, { useEffect } from 'react';
 import { useState } from 'react';
 import { Link } from "react-router-dom"
-import axios from "axios";
+import { useCookies } from 'react-cookie';
 
 const Field = () => {
-    const client = axios.create({
-        baseURL: "http://127.0.0.1:5000"
-    });
-    
+    const [cookies, setCookie] = useCookies(['job-field']);
     useEffect(() => {
         window.scrollTo(0, 0);
         }, []);
 
-        const [choosenField, setChoosenField] = useState('');
+    const [choosenField, setChoosenField] = useState('');
 
-        const handleButtonClick = (event) => {
-            setChoosenField(event.target.id);
-            console.log(event.target.id);
+    const handleButtonClick = (event) => {
+        setChoosenField(event.target.id);
+        console.log(event.target.id);
         };
-
-        const sendToBackEnd = () => {
-            const endpoint = "/questions";
-            client.get(endpoint, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Accept: 'application/json'
-                },
-                params:{
-                    job_field: choosenField
-                },
-                data:{}
-            })
-            .then(response => {
-            console.log('Success:', response);
-            // Handle success response here, such as displaying a success message to the user
-            })
-            .catch(error => {
-            console.error('Error:', error);
-            // Handle error response here, such as displaying an error message to the user
-            });
-        };
-            
-
-
+    
+    const handleFieldSelect = () => {
+        setCookie('job-field', choosenField, { path: '/' });
+        }
     return (
 
         <>
@@ -87,7 +63,7 @@ const Field = () => {
                     
                 </div>
 
-                <Link to="/example-case" ><button className="button-start" onClick={sendToBackEnd}>Next <span className="triangle"></span></button></Link>
+                <Link to="/example-case" ><button className="button-start" onClick={handleFieldSelect}>Next <span className="triangle"></span></button></Link>
             </div>
 
             {/* Ending the configuration process */}
