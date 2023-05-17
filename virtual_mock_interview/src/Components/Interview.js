@@ -1,53 +1,53 @@
 import React, { useEffect } from 'react';
 import { useState } from 'react';
-import { Link } from "react-router-dom"
 import {useNavigate} from 'react-router-dom';
 import axios from "axios";
 import Webcam from "react-webcam";
+import { useCookies } from 'react-cookie';
 
 
 const Interview = () => {
+
+    const [cookies] = useCookies(['job-field']);
+    const jobField = cookies['job-field'];
+    const [questions, setQuestions] = useState([]);
 
     const client = axios.create({
         baseURL: "http://127.0.0.1:5000"
     });
 
     useEffect(() => {
+        const fetchData = async () => {
+          try {
             const endpoint = "/questions";
-            client.get(endpoint, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Accept: 'application/json'
-                },
-                params:{
-                    
-                },
-                data:{}
-            })
-            .then(response => {
-            console.log('Success:', response);
-            // Handle success response here, such as displaying a success message to the user
-            })
-            .catch(error => {
+            const response = await client.get(endpoint, {
+              headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json'
+              },
+              params: {
+                job_field: jobField
+              },
+              data: {}
+            });
+      
+            const extractedQuestions = response.data.slice(0, 5).map(question => question.question_text);
+            setQuestions(extractedQuestions);
+          } catch (error) {
             console.error('Error:', error);
             // Handle error response here, such as displaying an error message to the user
-            });
-    }, []);
+          }
+        };
+      
+        fetchData();
+      }, [jobField]);
 
     const navigate = useNavigate();
-
-    const questionsArray = [
-        "how are you?",
-        "how is your day?",
-        "how is your life?",
-        "how is your family?",
-        "why are you here right now?"
-    ]
 
 
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [showFirstQuestion, setShowFirstQuestion] = useState(false);
-    const currentQuestion = showFirstQuestion ? questionsArray[currentQuestionIndex] : '';
+    const currentQuestion = showFirstQuestion ? questions[currentQuestionIndex] : '';
 
 
     const sendAndChange = () => {
@@ -75,6 +75,14 @@ const Interview = () => {
     const [capturing, setCapturing] = React.useState(false);
     const [recordedChunks, setRecordedChunks] = React.useState([]);
 
+
+    const handleDataAvailable = React.useCallback(({ data }) => {
+        if (data.size > 0) {
+            setRecordedChunks((prev) => prev.concat(data));
+        }
+        }, []);
+
+
     const handleStartCaptureClick = React.useCallback(() => {
         setCapturing(true);
         mediaRecorderRef.current = new MediaRecorder(webcamRef.current.stream, {
@@ -86,19 +94,12 @@ const Interview = () => {
             handleDataAvailable
         );
         mediaRecorderRef.current.start();
-    }, [webcamRef, setCapturing, mediaRecorderRef]);
-    
-    
-    const handleDataAvailable = React.useCallback(({ data }) => {
-    if (data.size > 0) {
-        setRecordedChunks((prev) => prev.concat(data));
-    }
-    }, []);
+    }, [webcamRef, setCapturing, mediaRecorderRef, handleDataAvailable]);
 
     const handleStopCaptureClick = React.useCallback(() => {
         mediaRecorderRef.current.stop();
         setCapturing(false);
-    }, [mediaRecorderRef, webcamRef, setCapturing]);
+    }, [mediaRecorderRef, setCapturing]);
         
         
     const handleSendToBackend = React.useCallback(() => {
@@ -166,37 +167,36 @@ const Interview = () => {
 
             if (counter === 0) {
                 firstStartCapturing();
-                setTimeout(() => {
-                    handleClick();
-                    sendAndChange2();
-                    setCounter(counter + 1);
-                    setButtonText('Next Question');
-                    console.log(counter);
-                }, 5000);
+
+                handleClick();
+                sendAndChange2();
+                setCounter(counter + 1);
+                setButtonText('Next Question');
+                console.log(counter);
                 
                 // start record
                 
                 
             } else if (counter === 4) {
+
+                nextQuestionCapturing();
                 sendAndChange();
                 setButtonText('End Interview');
                 // stop record + send to backened + start tany
-                nextQuestionCapturing();
                 setCounter(counter + 1);
                 console.log(counter);
-            }else if (counter === 6) {
-                // do something when counter is 5
-                // console.log("this is counter 5 baby");
-                // stop record + send to backend + go to report page
-                // stop record + send to backened
-                lastQuestionCapturing();
-                // Navigate to report page
+            }else if (counter === 5) {
+                nextQuestionCapturing();
+                sendAndChange();
+                setTimeout(() => {
+                    lastQuestionCapturing();
+                }, 5000);
                 
-
             } else {
+
+                nextQuestionCapturing();
                 sendAndChange();
                 // stop record + send to backened + start tany
-                nextQuestionCapturing();
                 setCounter(counter + 1);
                 console.log(counter);
             }
