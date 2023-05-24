@@ -4,9 +4,20 @@ import {useNavigate} from 'react-router-dom';
 import axios from "axios";
 import Webcam from "react-webcam";
 import { useCookies } from 'react-cookie';
+import { v4 as uuidv4 } from 'uuid';
 
 
 const Interview = () => {
+
+
+    const [userId, setUserId] = useState('');
+
+    useEffect(() => {
+        const generatedUserId = uuidv4(); // Generate a random user ID
+        setUserId(generatedUserId);
+    }, []);
+
+
 
     const [cookies] = useCookies(['job-field']);
     const jobField = cookies['job-field'];
@@ -108,7 +119,7 @@ const Interview = () => {
             type: "video/webm"
         });
         const formData = new FormData();
-        formData.append("video", blob, String((counter - 1)+"video.webm"));
+        formData.append("video", blob, `${userId}_${counter - 1}_video.webm`);
         axios.post("http://127.0.0.1:5000/video", formData)
             .then(response => {
             // Handle the response from the backend
