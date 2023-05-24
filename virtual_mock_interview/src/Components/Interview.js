@@ -119,7 +119,7 @@ const Interview = () => {
             type: "video/webm"
         });
         const formData = new FormData();
-        formData.append("video", blob, `${userId}_${counter - 1}_video.webm`);
+        formData.append("video", blob, `${userId}_${jobField}_${counter - 1}_video.webm`);
         axios.post("http://127.0.0.1:5000/video", formData)
             .then(response => {
             // Handle the response from the backend
@@ -173,30 +173,76 @@ const Interview = () => {
     // ------------------------------------------------------------
     
 
+    const [timeRemaining, setTimeRemaining] = useState(60);
+    const [displayTimer, setDisplayTimer] = useState(false);
+
+    const formatTime = (seconds) => {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+        return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+    };
+
+    const handleResetClick = () => {
+        setTimeRemaining(60);
+        setDisplayTimer(true);
+        console.log(displayTimer);
+    };
+
+    const handleTimerEnd = () => {
+        // Perform the desired action when the timer reaches zero
+        console.log('Timer reached zero!');
+        MajorFunction();
+        // Call your function here
+        // ...
+    };
+
+    useEffect(() => {
+        let interval = null;
+
+        if (timeRemaining > 0 && displayTimer) { // Only start timer if displayTimer is true
+            interval = setInterval(() => {
+            setTimeRemaining((prevTime) => prevTime - 1);
+            }, 1000);
+        }
+
+        if (timeRemaining === 0) {
+            handleTimerEnd();
+        }
+
+        return () => {
+        clearInterval(interval);
+        };
+    }, [timeRemaining, displayTimer]);
+
+
+
+
+    // ------------------------------------------------------------
+    // ------------------------------------------------------------
+    // ------------------------------------------------------------
 
 
     function MajorFunction() {
 
             if (counter === 0) {
                 firstStartCapturing();
-
                 handleClick();
                 sendAndChange2();
                 setCounter(counter + 1);
+                
                 setButtonText('Next Question');
                 console.log(counter);
-                
-                // start record
-                
-                
+                handleResetClick();
+
             } else if (counter === 4) {
                 nextQuestionCapturing();
                 sendAndChange();
                 setButtonText('End Interview');
                 // stop record + send to backened + start tany
-                
                 setCounter(counter + 1);
+                
                 console.log(counter);
+                handleResetClick();
             }
             else if (counter === 5) {
                 // do something when counter is 5
@@ -204,9 +250,11 @@ const Interview = () => {
                 // stop record + send to backend + go to report page
                 // stop record + send to backened
                 nextQuestionCapturing();
+                setIsClicked(false);
                 sendAndChange();
                 setButtonText('To Report Page');
                 setCounter(counter + 1);
+                setDisplayTimer(false);
                 console.log(counter);
                 // Navigate to report page
                 
@@ -226,9 +274,10 @@ const Interview = () => {
                 nextQuestionCapturing();
                 sendAndChange();
                 // stop record + send to backened + start tany
-                
                 setCounter(counter + 1);
+                
                 console.log(counter);
+                handleResetClick();
             }
         
     
@@ -258,6 +307,8 @@ const Interview = () => {
                 </div>
             </div>
 
+            
+
             <div className="instructions-parent instructions-parent-for-interview" >
                 
                 <div className="instructions-container" >
@@ -268,9 +319,16 @@ const Interview = () => {
 
                 <div className="question-container">
                     <div className="question-box question-box-for-interview">
-                        <div className={`icons-holder icons-for-interview  ${isClicked ? 'clicked' : ''}`}>
-                            <i className="fas fa-video"></i>
-                            <i className="fas fa-microphone"></i>
+                        <div className={`icons-holder-interview icons-for-interview  ${isClicked ? 'clicked' : ''}`}>
+                            <div>
+                                <i className="fas fa-video"></i>
+                                <i className="fas fa-microphone"></i>
+                            </div>
+                            <div>
+                                <div className={`timer ${displayTimer ? 'timer-update' : ''}`} >{formatTime(timeRemaining)}</div>
+                                
+                                {/* <button onClick={handleResetClick}>Reset</button> */}
+                            </div>
                         </div>
                         <div className="question" id='questionId' style={{ display: showFirstQuestion ? 'block' : 'none' }}>{currentQuestion}</div>
                             {/* <div className='ex-start-holder' ><button className="ex-start" onClick={sendAndChange2} >Start Answer </button></div> */}

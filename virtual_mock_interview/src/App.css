@@ -556,13 +556,15 @@ background-color: var(--background-color); /* Fallback color */
     font-size: 24px;
     text-align: center;
     margin-top: 30px;
-    padding: 10px;
-    padding-top: 65px;
-    padding-left: 20px;
-    padding-right: 20px;
     color: #264996;
     opacity: 0;
     animation: fade-in-for-question 0.5s forwards 0.5s;
+}
+
+#questionId {
+    padding-top: 65px;
+    padding-left: 20px;
+    padding-right: 20px;
 }
 
 .ex-start-holder {
@@ -617,6 +619,16 @@ background-color: var(--background-color); /* Fallback color */
     transform: translateY(-3px);
 }
 
+.icons-holder-interview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 50px;
+    margin: 20px;
+    opacity: 0;
+    animation: fade-in-for-question 0.5s forwards 0.5s;
+}
+
 .icons-holder {
     display: flex;
     align-items: center;
@@ -626,6 +638,27 @@ background-color: var(--background-color); /* Fallback color */
     margin: 20px;
     opacity: 0;
     animation: fade-in-for-question 0.5s forwards 0.5s;
+}
+
+.icons-for-interview {
+    justify-content: space-between;
+}
+
+.icons-for-interview i {
+    margin-right: 10px;
+}
+
+.icons-for-interview > div {
+    display: flex;
+    align-items: center;
+}
+
+.icons-for-interview > div > div {
+    margin-right: 10px;
+}
+
+.icons-for-interview > div button {
+    padding: 5px 10px;
 }
 
 .icons-holder i {
@@ -762,10 +795,16 @@ background-color: var(--background-color); /* Fallback color */
     }
 }
 
+/* ------------------ */
+/* timer  */
+.timer {
+    color: red;
+    display: none;
+}
 
-
-
-
+.timer-update {
+    display: initial;
+}
 
 
 
