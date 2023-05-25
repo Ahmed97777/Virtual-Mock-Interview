@@ -87,7 +87,8 @@ background-color: var(--background-color); /* Fallback color */
 
 .logo-container {
     margin: 0;
-    background: var(--background-color); /*Fallback color*/
+    /* background: var(--background-color); */
+    background: #e6e6e6;
     /* background: linear-gradient(to right, #2c2826, #000000); */
     width: 100%;
     height: 55px;
@@ -384,7 +385,7 @@ background-color: var(--background-color); /* Fallback color */
 }
 
 .instructions-parent {
-    border-top: 5px solid var(--front-color);
+    /* border-top: 5px solid var(--front-color); */
     background-color: var(--background-color);
     /* background-color: rgb(111, 40, 40); */
     /* padding: 100px; */
@@ -397,7 +398,8 @@ background-color: var(--background-color); /* Fallback color */
     margin: 0;
     /* background: #2c2826; Fallback color */
     /* background: linear-gradient(to right, #2c2826, #000000); */
-    background-color: var(--background-color);
+    /* background-color: var(--background-color); */
+    background: #e6e6e6;
     width: 100%;
     height: 55px;
 }
@@ -625,6 +627,7 @@ background-color: var(--background-color); /* Fallback color */
     justify-content: center;
     height: 50px;
     margin: 20px;
+    margin-bottom: 0;
     opacity: 0;
     animation: fade-in-for-question 0.5s forwards 0.5s;
 }
@@ -734,7 +737,7 @@ background-color: var(--background-color); /* Fallback color */
 }
 
 .instructions-parent-for-interview {
-    border-top: 5px solid var(--front-color);
+    /* border-top: 5px solid var(--front-color); */
     /* background: linear-gradient(to right, #2c2826, #000000); */
     background-color: var(--background-color);
 }
@@ -806,6 +809,22 @@ background-color: var(--background-color); /* Fallback color */
     display: initial;
 }
 
+.running-container {
+    display: flex;
+    justify-content: flex-end;
+    margin: 0;
+}
 
+.time-running {
+    display: none;
+    margin: 0;
+    margin-right: 15px;
+    font-weight: bold;
+    color: rgb(187, 11, 11);
+}
+
+.time-running-update {
+    display: initial;
+}
 
 

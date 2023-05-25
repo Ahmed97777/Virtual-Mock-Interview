@@ -173,8 +173,10 @@ const Interview = () => {
     // ------------------------------------------------------------
     
 
-    const [timeRemaining, setTimeRemaining] = useState(60);
+    const [timeRemaining, setTimeRemaining] = useState(20);
     const [displayTimer, setDisplayTimer] = useState(false);
+
+    const [displayRunningLate, setDisplayRunningLate] = useState(false);
 
     const formatTime = (seconds) => {
         const minutes = Math.floor(seconds / 60);
@@ -183,7 +185,7 @@ const Interview = () => {
     };
 
     const handleResetClick = () => {
-        setTimeRemaining(60);
+        setTimeRemaining(20);
         setDisplayTimer(true);
         console.log(displayTimer);
     };
@@ -194,6 +196,11 @@ const Interview = () => {
         MajorFunction();
         // Call your function here
         // ...
+    };
+
+    const handleTimerLate = () => {
+        console.log('Last ten seconds!');
+        setDisplayRunningLate(true);
     };
 
     useEffect(() => {
@@ -207,6 +214,8 @@ const Interview = () => {
 
         if (timeRemaining === 0) {
             handleTimerEnd();
+        }else if (timeRemaining === 10) {
+            handleTimerLate();
         }
 
         return () => {
@@ -232,6 +241,7 @@ const Interview = () => {
                 
                 setButtonText('Next Question');
                 console.log(counter);
+                setDisplayRunningLate(false);
                 handleResetClick();
 
             } else if (counter === 4) {
@@ -242,6 +252,7 @@ const Interview = () => {
                 setCounter(counter + 1);
                 
                 console.log(counter);
+                setDisplayRunningLate(false);
                 handleResetClick();
             }
             else if (counter === 5) {
@@ -277,6 +288,7 @@ const Interview = () => {
                 setCounter(counter + 1);
                 
                 console.log(counter);
+                setDisplayRunningLate(false);
                 handleResetClick();
             }
         
@@ -326,9 +338,12 @@ const Interview = () => {
                             </div>
                             <div>
                                 <div className={`timer ${displayTimer ? 'timer-update' : ''}`} >{formatTime(timeRemaining)}</div>
-                                
                                 {/* <button onClick={handleResetClick}>Reset</button> */}
                             </div>
+                            
+                        </div>
+                        <div className= "running-container" >
+                            <p className={`time-running ${displayRunningLate ? 'time-running-update' : ''}`} >Time Low</p>
                         </div>
                         <div className="question" id='questionId' style={{ display: showFirstQuestion ? 'block' : 'none' }}>{currentQuestion}</div>
                             {/* <div className='ex-start-holder' ><button className="ex-start" onClick={sendAndChange2} >Start Answer </button></div> */}
