@@ -9,6 +9,47 @@ import { v4 as uuidv4 } from 'uuid';
 
 const Interview = () => {
 
+    const [specificVariable, setSpecificVariable] = useState(false);
+
+    // const toggleVideoButton = () => {
+    //     setSpecificVariable(true);
+    //     console.log("this is the toggle on");
+    //     console.log(specificVariable);
+    // }
+
+    // const toggleVideoButtonOff = () => {
+    //     setSpecificVariable(false);
+    //     console.log("this is the toggle off");
+    //     console.log(specificVariable);
+    // }
+
+    const [isOn, setIsOn] = useState(false);
+
+    const handleToggle = () => {
+        setIsOn((prevState) => !prevState);
+    
+        // Call the appropriate function based on the toggle state
+        if (!isOn) {
+        // Function to execute when the toggle is turned on
+        specificFunctionOn();
+        } else {
+        // Function to execute when the toggle is turned off
+        specificFunctionOff();
+        }
+    };
+    
+    const specificFunctionOn = () => {
+        setSpecificVariable(true);
+        console.log("this is the toggle on");
+        console.log(specificVariable);
+    };
+    
+    const specificFunctionOff = () => {
+        setSpecificVariable(false);
+        console.log("this is the toggle off");
+        console.log(specificVariable);
+    };
+
 
     const [userId, setUserId] = useState('');
 
@@ -60,23 +101,7 @@ const Interview = () => {
     const [showFirstQuestion, setShowFirstQuestion] = useState(false);
     const currentQuestion = showFirstQuestion ? questions[currentQuestionIndex] : '';
 
-    const [specificVariable, setSpecificVariable] = useState(false);
-
-    const toggleVideoButton = () => {
-        setSpecificVariable(true);
-        console.log("this is the toggle on");
-        console.log(specificVariable);
-    }
-
-    const toggleVideoButtonOff = () => {
-        setSpecificVariable(false);
-        console.log("this is the toggle off");
-        console.log(specificVariable);
-    }
-
     
-
-
     const sendAndChange = () => {
         setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
@@ -333,8 +358,16 @@ const Interview = () => {
                                 <i className="fas fa-microphone"></i>
                             </div>
                             <div>
-                                <button onClick={toggleVideoButton} >show cam</button>
-                                <button onClick={toggleVideoButtonOff} >No cam</button>
+                                {/* <button onClick={toggleVideoButton} >show cam</button> */}
+                                {/* <button onClick={toggleVideoButtonOff} >No cam</button> */}
+                                <label className="switch">
+                                    <input
+                                        type="checkbox"
+                                        onChange={handleToggle}
+                                    />
+                                    <span className="slider round" />
+                                </label>
+                                <span className="toggle-text">{isOn ? 'Video On' : 'Video Off'}</span>
                                 <div className={`timer ${displayTimer ? 'timer-update' : ''}`} >{formatTime(timeRemaining)}</div>
                             </div>
                             
