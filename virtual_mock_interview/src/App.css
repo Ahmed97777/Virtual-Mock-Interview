@@ -582,6 +582,12 @@ background-color: var(--background-color); /* Fallback color */
     padding-right: 20px;
 }
 
+#questionId-without-video {
+    padding-top: 50px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
 .ex-start-holder {
     margin-top: 100px;
     text-align: center;

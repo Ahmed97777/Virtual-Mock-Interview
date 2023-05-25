@@ -60,6 +60,22 @@ const Interview = () => {
     const [showFirstQuestion, setShowFirstQuestion] = useState(false);
     const currentQuestion = showFirstQuestion ? questions[currentQuestionIndex] : '';
 
+    const [specificVariable, setSpecificVariable] = useState(false);
+
+    const toggleVideoButton = () => {
+        setSpecificVariable(true);
+        console.log("this is the toggle on");
+        console.log(specificVariable);
+    }
+
+    const toggleVideoButtonOff = () => {
+        setSpecificVariable(false);
+        console.log("this is the toggle off");
+        console.log(specificVariable);
+    }
+
+    
+
 
     const sendAndChange = () => {
         setCurrentQuestionIndex(currentQuestionIndex + 1);
@@ -317,6 +333,8 @@ const Interview = () => {
                                 <i className="fas fa-microphone"></i>
                             </div>
                             <div>
+                                <button onClick={toggleVideoButton} >show cam</button>
+                                <button onClick={toggleVideoButtonOff} >No cam</button>
                                 <div className={`timer ${displayTimer ? 'timer-update' : ''}`} >{formatTime(timeRemaining)}</div>
                             </div>
                             
@@ -324,11 +342,11 @@ const Interview = () => {
                         <div className= "running-container" >
                             <p className={`time-running ${displayRunningLate ? 'time-running-update' : ''}`} >Time Low</p>
                         </div>
-                        <div className="question" id='questionId' style={{ display: showFirstQuestion ? 'block' : 'none' }}>
+                        <div className="question" id={`${specificVariable ? 'questionId' : 'questionId-without-video'}`} style={{ display: showFirstQuestion ? 'block' : 'none' }}>
                             {currentQuestion}
                         </div>
 
-                        <Webcam className='interview-vid' audio={true} ref={webcamRef} muted={true} />
+                        <Webcam className='interview-vid' audio={true} ref={webcamRef} muted={true} style={{ display: specificVariable ? 'block' : 'none' }} />
                         
 
                     </div>
