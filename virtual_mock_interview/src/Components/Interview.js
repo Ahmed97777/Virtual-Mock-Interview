@@ -29,29 +29,29 @@ const Interview = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-          try {
+        try {
             const endpoint = "/questions";
             const response = await client.get(endpoint, {
-              headers: {
+            headers: {
                 'Content-Type': 'application/json',
                 Accept: 'application/json'
-              },
-              params: {
+            },
+            params: {
                 job_field: jobField
-              },
-              data: {}
+            },
+            data: {}
             });
-      
+    
             const extractedQuestions = response.data.slice(0, 5).map(question => question.question_text);
             setQuestions(extractedQuestions);
-          } catch (error) {
+        } catch (error) {
             console.error('Error:', error);
             // Handle error response here, such as displaying an error message to the user
-          }
+        }
         };
-      
+    
         fetchData();
-      }, [jobField]);
+    }, [jobField]);
 
     const navigate = useNavigate();
 
@@ -163,7 +163,6 @@ const Interview = () => {
             console.log("last question Recording stopped");
             handleSendToBackend();
             console.log("last question Recording sent to backend");
-            // return <Link to="/report">Go to Report</Link>;
             navigate('/report');
         }
     };
@@ -191,11 +190,8 @@ const Interview = () => {
     };
 
     const handleTimerEnd = () => {
-        // Perform the desired action when the timer reaches zero
         console.log('Timer reached zero!');
         MajorFunction();
-        // Call your function here
-        // ...
     };
 
     const handleTimerLate = () => {
@@ -206,7 +202,7 @@ const Interview = () => {
     useEffect(() => {
         let interval = null;
 
-        if (timeRemaining > 0 && displayTimer) { // Only start timer if displayTimer is true
+        if (timeRemaining > 0 && displayTimer) {
             interval = setInterval(() => {
             setTimeRemaining((prevTime) => prevTime - 1);
             }, 1000);
@@ -238,7 +234,6 @@ const Interview = () => {
                 handleClick();
                 sendAndChange2();
                 setCounter(counter + 1);
-                
                 setButtonText('Next Question');
                 console.log(counter);
                 setDisplayRunningLate(false);
@@ -248,18 +243,13 @@ const Interview = () => {
                 nextQuestionCapturing();
                 sendAndChange();
                 setButtonText('End Interview');
-                // stop record + send to backened + start tany
                 setCounter(counter + 1);
-                
                 console.log(counter);
                 setDisplayRunningLate(false);
                 handleResetClick();
+
             }
             else if (counter === 5) {
-                // do something when counter is 5
-                // console.log("this is counter 5 baby");
-                // stop record + send to backend + go to report page
-                // stop record + send to backened
                 nextQuestionCapturing();
                 setIsClicked(false);
                 sendAndChange();
@@ -268,33 +258,23 @@ const Interview = () => {
                 setCounter(counter + 1);
                 setDisplayTimer(false);
                 console.log(counter);
-                // Navigate to report page
                 
             }
             else if (counter === 6) {
-                // do something when counter is 5
-                // console.log("this is counter 5 baby");
-                // stop record + send to backend + go to report page
-                // stop record + send to backened
                 console.log("i am in counter 6")
                 lastQuestionCapturing();
                 sendAndChange();
-                // Navigate to report page
                 
             }
             else {
                 nextQuestionCapturing();
                 sendAndChange();
-                // stop record + send to backened + start tany
                 setCounter(counter + 1);
-                
                 console.log(counter);
                 setDisplayRunningLate(false);
                 handleResetClick();
             }
         
-    
-        // rest of your code here
     }
     
 
@@ -325,7 +305,6 @@ const Interview = () => {
             <div className="instructions-parent instructions-parent-for-interview" >
                 
                 <div className="instructions-container" >
-                    {/* <h2 className="main-title-2" >Interview Started:</h2> */}
                 </div>
 
 
@@ -339,22 +318,19 @@ const Interview = () => {
                             </div>
                             <div>
                                 <div className={`timer ${displayTimer ? 'timer-update' : ''}`} >{formatTime(timeRemaining)}</div>
-                                {/* <button onClick={handleResetClick}>Reset</button> */}
                             </div>
                             
                         </div>
                         <div className= "running-container" >
                             <p className={`time-running ${displayRunningLate ? 'time-running-update' : ''}`} >Time Low</p>
                         </div>
-                        <div className="question" id='questionId' style={{ display: showFirstQuestion ? 'block' : 'none' }}>{currentQuestion}</div>
+                        <div className="question" id='questionId' style={{ display: showFirstQuestion ? 'block' : 'none' }}>
+                            {currentQuestion}
+                        </div>
 
-                        <Webcam audio={true} ref={webcamRef} muted={true} style={{ display: 'none' }} />
+                        <Webcam className='interview-vid' audio={true} ref={webcamRef} muted={true} />
+                        
 
-                            {/* <div className='ex-start-holder' ><button className="ex-start" onClick={sendAndChange2} >Start Answer </button></div> */}
-                            {/* <div className='ex-next-holder' ><button className="ex-next" onClick={sendAndChange} >Next question </button></div> */}
-                            {/* <div className="question" id='questionId'>{currentQuestion}</div>
-                            <div className='ex-start-holder' ><button className="ex-start" >Start Answer </button></div>
-                            <div className='ex-next-holder' ><button className="ex-next" onClick={sendAndChange} >Next question </button></div> */}
                     </div>
                 </div>
 
@@ -362,8 +338,6 @@ const Interview = () => {
                     <button className="button-start" onClick={MajorFunction} >{buttonText} <span className="triangle"></span></button>
                 </div>
 
-
-                {/* <Link to="/report" ><button className="button-start" >Start Interview <span className="triangle"></span></button></Link> */}
 
 
 
