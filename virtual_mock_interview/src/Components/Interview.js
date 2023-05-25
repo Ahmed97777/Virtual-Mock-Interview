@@ -264,6 +264,7 @@ const Interview = () => {
                 setIsClicked(false);
                 sendAndChange();
                 setButtonText('To Report Page');
+                setDisplayRunningLate(false);
                 setCounter(counter + 1);
                 setDisplayTimer(false);
                 console.log(counter);
@@ -310,7 +311,7 @@ const Interview = () => {
         <>
 
             {/* <Webcam audio={true} ref={webcamRef} /> */}
-            <Webcam audio={true} ref={webcamRef} muted={true} style={{ display: 'none' }} />
+            {/* <Webcam audio={true} ref={webcamRef} muted={true} style={{ display: 'none' }} /> */}
 
 
             <div className="logo-container-for-config" >
@@ -346,6 +347,9 @@ const Interview = () => {
                             <p className={`time-running ${displayRunningLate ? 'time-running-update' : ''}`} >Time Low</p>
                         </div>
                         <div className="question" id='questionId' style={{ display: showFirstQuestion ? 'block' : 'none' }}>{currentQuestion}</div>
+
+                        <Webcam audio={true} ref={webcamRef} muted={true} style={{ display: 'none' }} />
+
                             {/* <div className='ex-start-holder' ><button className="ex-start" onClick={sendAndChange2} >Start Answer </button></div> */}
                             {/* <div className='ex-next-holder' ><button className="ex-next" onClick={sendAndChange} >Next question </button></div> */}
                             {/* <div className="question" id='questionId'>{currentQuestion}</div>
