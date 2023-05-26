@@ -2,7 +2,7 @@ from flask import request, jsonify
 from werkzeug.utils import secure_filename
 from werkzeug.datastructures import FileStorage
 from flask_restful import Resource, reqparse
-from app.video_analyzer import VideoAnlyzer
+from app.video_analyzer_models.video_analyzer import VideoAnlyzer
 from app import app
 import os
 
@@ -27,6 +27,7 @@ class Video(Resource):
         video_file = request.files["video"]
         if video_file and self.allowed_file(video_file.filename):
             video_filename = secure_filename(video_file.filename)
+            # get video id from the filename
             video_file.save(os.path.join(app.config['UPLOAD_FOLDER'], video_filename))
 
         # Analyze the video.
