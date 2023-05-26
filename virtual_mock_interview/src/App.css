@@ -847,6 +847,8 @@ background-color: var(--background-color); /* Fallback color */
     display: initial;
 }
 
+/* end of timer style */
+
 /* ---- toggle slider style */
 .switch {
     position: relative;
@@ -869,7 +871,7 @@ background-color: var(--background-color); /* Fallback color */
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #ccc;
+    background-color: #898989;
     -webkit-transition: .4s;
     transition: .4s;
 }
