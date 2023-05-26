@@ -27,7 +27,7 @@ const Config = () => {
             
                 <div className="instructions-container" >
                     <h2 className="main-title-2" >How to start the interview:</h2>
-                    <h2 className="main-title-2" >1- Please allow access for camera permission, mic permission:</h2>
+                    <h2 className="main-title-2" >1- Please allow access for camera and mic permission:</h2>
                 </div>
 
 
@@ -46,7 +46,7 @@ const Config = () => {
                     <Webcam className= "web-cam" audio={audioFlag}  ref={webcamRef} muted={true} onUserMediaError={onUserMediaError} />
                 )}
                 </div>
-                <Link to="/field"><button className="button-start" >Next <span className="triangle"></span></button></Link>
+                <Link to="/field"><button className="button-start" >Next choose your field <span className="triangle"></span></button></Link>
             </div>
 
 

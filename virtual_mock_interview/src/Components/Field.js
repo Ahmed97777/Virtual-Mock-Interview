@@ -33,7 +33,7 @@ const Field = () => {
             
                 <div className="instructions-container" >
                     <h2 className="main-title-2" >How to start the interview:</h2>
-                    <h2 className="main-title-2" >2- Please choose a field:</h2>
+                    <h2 className="main-title-2" >2- Please choose the field you want to make an interview in:</h2>
                 </div>
 
             </div>
@@ -63,7 +63,7 @@ const Field = () => {
                     
                 </div>
 
-                <Link to="/example-case" ><button className="button-start" onClick={handleFieldSelect}>Next <span className="triangle"></span></button></Link>
+                <Link to="/example-case" ><button className="button-start" onClick={handleFieldSelect}>Next see an example <span className="triangle"></span></button></Link>
             </div>
 
             {/* Ending the configuration process */}
