@@ -161,7 +161,7 @@ const Interview = () => {
         });
         const formData = new FormData();
         formData.append("video", blob, `${userId}_${jobField}_${counter - 1}_video.webm`);
-        axios.post("http://127.0.0.1:5000/video", formData)
+        axios.post(`http://127.0.0.1:5000/video/userId = ${userId}`, formData)
             .then(response => {
             // Handle the response from the backend
             })
