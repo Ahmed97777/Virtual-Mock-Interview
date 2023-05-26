@@ -4,9 +4,61 @@ import {useNavigate} from 'react-router-dom';
 import axios from "axios";
 import Webcam from "react-webcam";
 import { useCookies } from 'react-cookie';
+import { v4 as uuidv4 } from 'uuid';
 
 
 const Interview = () => {
+
+    const [specificVariable, setSpecificVariable] = useState(false);
+
+    // const toggleVideoButton = () => {
+    //     setSpecificVariable(true);
+    //     console.log("this is the toggle on");
+    //     console.log(specificVariable);
+    // }
+
+    // const toggleVideoButtonOff = () => {
+    //     setSpecificVariable(false);
+    //     console.log("this is the toggle off");
+    //     console.log(specificVariable);
+    // }
+
+    const [isOn, setIsOn] = useState(false);
+
+    const handleToggle = () => {
+        setIsOn((prevState) => !prevState);
+    
+        // Call the appropriate function based on the toggle state
+        if (!isOn) {
+        // Function to execute when the toggle is turned on
+        specificFunctionOn();
+        } else {
+        // Function to execute when the toggle is turned off
+        specificFunctionOff();
+        }
+    };
+    
+    const specificFunctionOn = () => {
+        setSpecificVariable(true);
+        console.log("this is the toggle on");
+        console.log(specificVariable);
+    };
+    
+    const specificFunctionOff = () => {
+        setSpecificVariable(false);
+        console.log("this is the toggle off");
+        console.log(specificVariable);
+    };
+
+
+    const [userId, setUserId] = useState('');
+
+    useEffect(() => {
+        const generatedUserId = uuidv4(); // Generate a random user ID
+        setUserId(generatedUserId);
+    }, []);
+
+
 
     const [cookies] = useCookies(['job-field']);
     const jobField = cookies['job-field'];
@@ -18,29 +70,29 @@ const Interview = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-          try {
+        try {
             const endpoint = "/questions";
             const response = await client.get(endpoint, {
-              headers: {
+            headers: {
                 'Content-Type': 'application/json',
                 Accept: 'application/json'
-              },
-              params: {
+            },
+            params: {
                 job_field: jobField
-              },
-              data: {}
+            },
+            data: {}
             });
-      
+    
             const extractedQuestions = response.data.slice(0, 5).map(question => question.question_text);
             setQuestions(extractedQuestions);
-          } catch (error) {
+        } catch (error) {
             console.error('Error:', error);
             // Handle error response here, such as displaying an error message to the user
-          }
+        }
         };
-      
+    
         fetchData();
-      }, [jobField]);
+    }, [jobField]);
 
     const navigate = useNavigate();
 
@@ -49,7 +101,7 @@ const Interview = () => {
     const [showFirstQuestion, setShowFirstQuestion] = useState(false);
     const currentQuestion = showFirstQuestion ? questions[currentQuestionIndex] : '';
 
-
+    
     const sendAndChange = () => {
         setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
@@ -109,7 +161,7 @@ const Interview = () => {
         });
         const formData = new FormData();
         formData.append("video", blob, `${userId}_${jobField}_${counter - 1}_video.webm`);
-        axios.post(`http://127.0.0.1:5000/video/userId = ${userId}`, formData)
+        axios.post(`http://127.0.0.1:5000/video?userId=${userId}`, formData)
             .then(response => {
             // Handle the response from the backend
             })
@@ -152,7 +204,6 @@ const Interview = () => {
             console.log("last question Recording stopped");
             handleSendToBackend();
             console.log("last question Recording sent to backend");
-            // return <Link to="/report">Go to Report</Link>;
             navigate('/report');
         }
     };
@@ -162,66 +213,109 @@ const Interview = () => {
     // ------------------------------------------------------------
     
 
+    const [timeRemaining, setTimeRemaining] = useState(20);
+    const [displayTimer, setDisplayTimer] = useState(false);
+
+    const [displayRunningLate, setDisplayRunningLate] = useState(false);
+
+    const formatTime = (seconds) => {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+        return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+    };
+
+    const handleResetClick = () => {
+        setTimeRemaining(20);
+        setDisplayTimer(true);
+        console.log(displayTimer);
+    };
+
+    const handleTimerEnd = () => {
+        console.log('Timer reached zero!');
+        MajorFunction();
+    };
+
+    const handleTimerLate = () => {
+        console.log('Last ten seconds!');
+        setDisplayRunningLate(true);
+    };
+
+    useEffect(() => {
+        let interval = null;
+
+        if (timeRemaining > 0 && displayTimer) {
+            interval = setInterval(() => {
+            setTimeRemaining((prevTime) => prevTime - 1);
+            }, 1000);
+        }
+
+        if (timeRemaining === 0) {
+            handleTimerEnd();
+        }else if (timeRemaining === 10) {
+            handleTimerLate();
+        }
+
+        return () => {
+        clearInterval(interval);
+        };
+    }, [timeRemaining, displayTimer]);
+
+
+
+
+    // ------------------------------------------------------------
+    // ------------------------------------------------------------
+    // ------------------------------------------------------------
 
 
     function MajorFunction() {
 
             if (counter === 0) {
                 firstStartCapturing();
-
                 handleClick();
                 sendAndChange2();
                 setCounter(counter + 1);
                 setButtonText('Next Question');
                 console.log(counter);
-                
-                // start record
-                
-                
+                setDisplayRunningLate(false);
+                handleResetClick();
+
             } else if (counter === 4) {
                 nextQuestionCapturing();
                 sendAndChange();
                 setButtonText('End Interview');
-                // stop record + send to backened + start tany
-                
                 setCounter(counter + 1);
                 console.log(counter);
+                setDisplayRunningLate(false);
+                handleResetClick();
+
             }
             else if (counter === 5) {
-                // do something when counter is 5
-                // console.log("this is counter 5 baby");
-                // stop record + send to backend + go to report page
-                // stop record + send to backened
                 nextQuestionCapturing();
+                setIsClicked(false);
                 sendAndChange();
                 setButtonText('To Report Page');
+                setDisplayRunningLate(false);
                 setCounter(counter + 1);
+                setDisplayTimer(false);
                 console.log(counter);
-                // Navigate to report page
                 
             }
             else if (counter === 6) {
-                // do something when counter is 5
-                // console.log("this is counter 5 baby");
-                // stop record + send to backend + go to report page
-                // stop record + send to backened
                 console.log("i am in counter 6")
                 lastQuestionCapturing();
                 sendAndChange();
-                // Navigate to report page
                 
             }
             else {
                 nextQuestionCapturing();
                 sendAndChange();
-                // stop record + send to backened + start tany
-                
                 setCounter(counter + 1);
                 console.log(counter);
+                setDisplayRunningLate(false);
+                handleResetClick();
             }
         
-    
-        // rest of your code here
     }
     
 
@@ -238,7 +332,7 @@ const Interview = () => {
         <>
 
             {/* <Webcam audio={true} ref={webcamRef} /> */}
-            <Webcam audio={true} ref={webcamRef} muted={true} style={{ display: 'none' }} />
+            {/* <Webcam audio={true} ref={webcamRef} muted={true} style={{ display: 'none' }} /> */}
 
 
             <div className="logo-container-for-config" >
@@ -247,26 +341,47 @@ const Interview = () => {
                 </div>
             </div>
 
+            
+
             <div className="instructions-parent instructions-parent-for-interview" >
                 
                 <div className="instructions-container" >
-                    {/* <h2 className="main-title-2" >Interview Started:</h2> */}
                 </div>
 
 
 
                 <div className="question-container">
                     <div className="question-box question-box-for-interview">
-                        <div className={`icons-holder icons-for-interview  ${isClicked ? 'clicked' : ''}`}>
-                            <i className="fas fa-video"></i>
-                            <i className="fas fa-microphone"></i>
+                        <div className={`icons-holder-interview icons-for-interview  ${isClicked ? 'clicked' : ''}`}>
+                            <div>
+                                <i className="fas fa-video"></i>
+                                <i className="fas fa-microphone"></i>
+                            </div>
+                            <div>
+                                {/* <button onClick={toggleVideoButton} >show cam</button> */}
+                                {/* <button onClick={toggleVideoButtonOff} >No cam</button> */}
+                                <label className="switch">
+                                    <input
+                                        type="checkbox"
+                                        onChange={handleToggle}
+                                    />
+                                    <span className="slider round" />
+                                </label>
+                                <span className="toggle-text">{isOn ? 'Video On' : 'Video Off'}</span>
+                                <div className={`timer ${displayTimer ? 'timer-update' : ''}`} >{formatTime(timeRemaining)}</div>
+                            </div>
+                            
                         </div>
-                        <div className="question" id='questionId' style={{ display: showFirstQuestion ? 'block' : 'none' }}>{currentQuestion}</div>
-                            {/* <div className='ex-start-holder' ><button className="ex-start" onClick={sendAndChange2} >Start Answer </button></div> */}
-                            {/* <div className='ex-next-holder' ><button className="ex-next" onClick={sendAndChange} >Next question </button></div> */}
-                            {/* <div className="question" id='questionId'>{currentQuestion}</div>
-                            <div className='ex-start-holder' ><button className="ex-start" >Start Answer </button></div>
-                            <div className='ex-next-holder' ><button className="ex-next" onClick={sendAndChange} >Next question </button></div> */}
+                        <div className= "running-container" >
+                            <p className={`time-running ${displayRunningLate ? 'time-running-update' : ''}`} >Time Low</p>
+                        </div>
+                        <div className="question" id={`${specificVariable ? 'questionId' : 'questionId-without-video'}`} style={{ display: showFirstQuestion ? 'block' : 'none' }}>
+                            {currentQuestion}
+                        </div>
+
+                        <Webcam className='interview-vid' audio={true} ref={webcamRef} muted={true} style={{ display: specificVariable ? 'block' : 'none' }} />
+                        
+
                     </div>
                 </div>
 
@@ -274,8 +389,6 @@ const Interview = () => {
                     <button className="button-start" onClick={MajorFunction} >{buttonText} <span className="triangle"></span></button>
                 </div>
 
-
-                {/* <Link to="/report" ><button className="button-start" >Start Interview <span className="triangle"></span></button></Link> */}
 
 
 

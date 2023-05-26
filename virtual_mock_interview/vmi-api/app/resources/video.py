@@ -5,6 +5,7 @@ from flask_restful import Resource, reqparse
 from app.video_analyzer_models.video_analyzer import VideoAnlyzer
 from app import app
 import os
+import re
 
 ALLOWED_EXTENSIONS = {'mp4', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm'}
 
@@ -17,7 +18,6 @@ class Video(Resource):
 
         # Check for secure file.
         video_file = request.files["video"]
-        user_id = request.args.get["userId"]
         print("DEBUG: Video file: ", video_file)
         if not secure_filename(video_file.filename):
             return 400, "Invalid file name."
@@ -30,14 +30,20 @@ class Video(Resource):
         if video_file and self.allowed_file(video_file.filename):
             video_filename = secure_filename(video_file.filename)
             # get video id from the filename
-            video_file.save(os.path.join(app.config['UPLOAD_FOLDER'] + user_id, video_filename))
+            # create dir of user_id if not exist
+            # if video contains 1_video then create dir of user id
+            isFirstFile = re.search(r'(\d+)_video', video_filename)
+            if isFirstFile is not None:
+                os.makedirs(app.config['UPLOAD_FOLDER']+ '/' + request.args.get("userId"))
+            # save video file
+            video_file.save(os.path.join(app.config['UPLOAD_FOLDER'] + '/'+ request.args.get("userId"), video_filename))
 
         # Analyze the video.
         video_id = video_filename.split('.')[0]
-        analysis = VideoAnlyzer.analyze_video(user_id, video_id)
+        VideoAnlyzer.analyze_video(request.args.get("userId"), video_id)
 
         # Return the video analysis results.
-        return jsonify(analysis)
+        return jsonify({'msg': 'Video analysis completed.'})
         
     def allowed_file(self, filename):
         return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS

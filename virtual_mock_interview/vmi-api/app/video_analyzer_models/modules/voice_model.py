@@ -4,7 +4,9 @@ import librosa
 from . import audio_preprocessing as ap
 from collections import Counter
 import re
+import os
 import subprocess
+from app import app
 
 class VoiceModel:
     '''
@@ -29,7 +31,10 @@ class VoiceModel:
         # load the models
         #self.speechToTextModel = whisper.load_model(model)
         print("INFO: loading emotions model")
-        self.emotion_model = pickle.load(open('models/speech_emotion_analysis.pkl', 'rb'))
+        current_file = os.path.abspath(__file__)
+        current_dir = os.path.dirname(current_file)
+        model_path = os.path.join(current_dir, '..', app.config['VOICE_MODEL_PKL'])
+        self.emotion_model = pickle.load(open('../models/speech_emotion_analysis.pkl', 'rb'))
         print("INFO: model loaded")
         
     
