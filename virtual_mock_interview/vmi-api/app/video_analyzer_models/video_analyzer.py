@@ -1,29 +1,22 @@
 import cv2
 import os
 import subprocess
-#from app import app
-#from app.video_analyzer_models.modules.facial_model import FacialModel
-#from app.video_analyzer_models.modules.voice_model import VoiceModel
-from modules.facial_model import FacialModel
-from modules.voice_model import VoiceModel
+from app import app
+from app.video_analyzer_models.modules.facial_model import FacialModel
+from app.video_analyzer_models.modules.voice_model import VoiceModel
 
 class VideoAnlyzer:
-    def __init__(self):
-        # if we will do parallel approach later we will init the models here , otherwise we will init them exactly where
-        # we need them to utilize gpu usage
-        # self.facialModel = FacialModel()
-        self.voiceModel = VoiceModel()
-
-    def analyze_video(self, video_id, DEBUG=False):
+    @staticmethod
+    def analyze_video(user_id,video_id, DEBUG=False):
 
         currentDirectory =  os.getcwd()
-        distinationDirectory = '../../uploads/'+ video_id
+        distinationDirectory =app.config['UPLOAD_FOLDER']+'/'+ user_id
         os.chdir(distinationDirectory)                                                                              
         # using ffmpeg to get audio from the webm video in a parrallel subprocess
         # ffmpeg -i "video_id.webm" -q:a 0 -map a "video_id.wav"
         process1 = subprocess.call(['ffmpeg', '-i', video_id + '.webm', '-q:a', '0', '-map', 'a', video_id + '.wav'])
-
-        silentTimeStamps, speechTimeStamps, text, simpleFillerDictionary, complexFillerDictionary, mostCommonSimpleFiller, emotionList  = self.voiceModel.voiceModel(video_id , DEBUG)
+        voiceModel = VoiceModel()
+        silentTimeStamps, speechTimeStamps, text, simpleFillerDictionary, complexFillerDictionary, mostCommonSimpleFiller, emotionList  = voiceModel.voiceModel(video_id , DEBUG)
         # load facial model here instead of init to utilize gpu usage
         facialModel = FacialModel()
         # using opencv library to process the video and send the frames to the facial model
@@ -71,33 +64,33 @@ class VideoAnlyzer:
         return iris_pos_per_frame, facial_emotion_per_frame, energy_per_frame, silentTimeStamps, speechTimeStamps, text, simpleFillerDictionary, complexFillerDictionary, mostCommonSimpleFiller, emotionList
         
 
-if __name__ == "__main__":
-    videoPath = '1video'
-    videoAnalyzer = VideoAnlyzer()
-    iris_pos_per_frame, facial_emotion_per_frame, energy_per_frame, silentTimeStamps, speechTimeStamps, text, simpleFillerDictionary, complexFillerDictionary, mostCommonSimpleFiller, emotionList = videoAnalyzer.analyze_video(videoPath, DEBUG=True)
+# if __name__ == "__main__":
+#     videoPath = '1video'
+#     videoAnalyzer = VideoAnlyzer()
+#     iris_pos_per_frame, facial_emotion_per_frame, energy_per_frame, silentTimeStamps, speechTimeStamps, text, simpleFillerDictionary, complexFillerDictionary, mostCommonSimpleFiller, emotionList = videoAnalyzer.analyze_video(videoPath, DEBUG=True)
 
-    print("IRIS_POS:   ", iris_pos_per_frame)
-    print("__________________________________")
-    print("EMOTIONS:    ", facial_emotion_per_frame)
-    print("__________________________________")
-    print("ENERGY:      ", energy_per_frame)
+#     print("IRIS_POS:   ", iris_pos_per_frame)
+#     print("__________________________________")
+#     print("EMOTIONS:    ", facial_emotion_per_frame)
+#     print("__________________________________")
+#     print("ENERGY:      ", energy_per_frame)
 
-    print("__________________________________")
-    print("SILENT:      ", silentTimeStamps)
-    print("__________________________________")
-    print("SPEECH:      ", speechTimeStamps)
-    print("__________________________________")
-    print("TEXT:        ", text)
-    print("__________________________________")
-    print("SIMPLE:      ", simpleFillerDictionary)
-    print("__________________________________")
-    print("COMPLEX:     ", complexFillerDictionary)
-    print("__________________________________")
-    print("MOST COMMON: ", mostCommonSimpleFiller)
-    print("__________________________________")
-    print("EMOTION LIST:", emotionList)
-    print("__________________________________")
-    print("__________________________________")
+#     print("__________________________________")
+#     print("SILENT:      ", silentTimeStamps)
+#     print("__________________________________")
+#     print("SPEECH:      ", speechTimeStamps)
+#     print("__________________________________")
+#     print("TEXT:        ", text)
+#     print("__________________________________")
+#     print("SIMPLE:      ", simpleFillerDictionary)
+#     print("__________________________________")
+#     print("COMPLEX:     ", complexFillerDictionary)
+#     print("__________________________________")
+#     print("MOST COMMON: ", mostCommonSimpleFiller)
+#     print("__________________________________")
+#     print("EMOTION LIST:", emotionList)
+#     print("__________________________________")
+#     print("__________________________________")
 
 
         

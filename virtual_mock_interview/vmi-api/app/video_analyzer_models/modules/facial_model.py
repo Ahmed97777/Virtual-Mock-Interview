@@ -7,6 +7,7 @@ from configparser import ConfigParser
 import json
 from . import facial_emotion_detection as fed
 import time
+from app import app
 
 class FacialModel:
     
@@ -28,8 +29,15 @@ class FacialModel:
     def __init__(self):
         # read config sections
         self.config = ConfigParser()
-        self.config.read("../../app/video_analyzer_models/config.ini")
-        self.emotion_model = fed.FacialEmotionAnalysis("../../app/video_analyzer_models/models/face_emotion_analysis.json", "../../app/video_analyzer_models/models/face_emotion_analysis_weights.h5")
+        
+        current_file = os.path.abspath(__file__)
+        current_dir = os.path.dirname(current_file)
+        config_path = os.path.join(current_dir, '..', app.config['FACIAL_CONFIG'])
+        model_path = os.path.join(current_dir, '..', app.config['FACIAL_MODEL_JSON'])
+        model_weights = os.path.join(current_dir, '..', app.config['FACIAL_MODEL_WEIGHTS'])
+        
+        self.config.read(config_path)
+        self.emotion_model = fed.FacialEmotionAnalysis(model_path, model_weights)
         # eyes indexes in mediapipe
         self.LEFT_EYE = json.loads(self.config.get('FACE_INDEXES', 'LEFT_EYE'))
         self.RIGHT_EYE = json.loads(self.config.get('FACE_INDEXES', 'RIGHT_EYE'))
@@ -105,19 +113,19 @@ class FacialModel:
         
         # determine iris position based on the calculated ratios
         if nose_to_eye_ratio <= 0.30:
-            iris_position = "Right"
+            iris_position = "right"
         
         elif nose_to_eye_ratio > 0.30 and nose_to_eye_ratio <= 0.70:
             
             if iris_ratio <= 0.40:
-                iris_position = "Right"
+                iris_position = "right"
             elif iris_ratio > 0.40 and iris_ratio <= 0.60:
 
-                iris_position = "Center"
+                iris_position = "center"
             else:
-                iris_position = "Left"     
+                iris_position = "left"     
         else:
-            iris_position = "Left"
+            iris_position = "left"
         
         return iris_position, iris_ratio, nose_to_eye_ratio
 
@@ -203,7 +211,7 @@ class FacialModel:
                     if DEBUG:
                         cv2.putText(
                             frame, 
-                            f"Iris pos: {iris_pos} eye: {iris_ratio: .2f} head: {nose_to_eye_ratio: 0.2f}",
+                            f"Iris pos: {iris_pos} - eye: {iris_ratio: 0.2f} - head: {nose_to_eye_ratio: 0.2f}",
                             (30,60),
                             cv2.FONT_HERSHEY_SIMPLEX,
                             0.5,
@@ -212,7 +220,7 @@ class FacialModel:
                         )
                         cv2.putText(
                             frame, 
-                            f"Iris pos: {iris_pos} eye: {iris_ratio: .2f} head: {nose_to_eye_ratio: 0.2f}",
+                            f"Iris pos: {iris_pos} - eye: {iris_ratio: .2f} - head: {nose_to_eye_ratio: 0.2f}",
                             (30,60),
                             cv2.FONT_HERSHEY_SIMPLEX,
                             0.5,
@@ -286,9 +294,8 @@ class FacialModel:
                 return orignal_frame, pred
             # predict the emotion of the face
             pred = self.emotion_model.predict_emotion(roi[np.newaxis, :, :, np.newaxis])
-            # pred is either "Angry", "Disgust", "Fear", "Sad","Surprise" --> negative emotions
-            # or "Happy", "Neutral" --> positive emotions
-            # change pred to "Axious" if the emotion is negative, "Not Axious" otherwise
+            # if pred is either "Sad","Neutral" --> Not Energetic
+            # else if  "Happy", "Angry", "Disgust", "Fear", "Surprise" --> Energetic
             # 
             isEnergitic = None
             if pred in ["Sad","Neutral"]:
@@ -303,9 +310,9 @@ class FacialModel:
         return orignal_frame, pred, isEnergitic
 
 #-------------------for testing the model----------------------- #
-if __name__ == "__main__":
-    faceModel = FacialModel()
-    faceModel.dummyMain(DEBUG = True)
+# if __name__ == "__main__":
+#     faceModel = FacialModel()
+#     faceModel.dummyMain(DEBUG = True)
 
  
         
