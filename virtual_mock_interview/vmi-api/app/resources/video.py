@@ -13,9 +13,11 @@ class Video(Resource):
     def __init__(self):
         self.parser = reqparse.RequestParser()
         self.parser.add_argument('video', type=FileStorage, location='files')
+        self.parser.add_argument('userId', type=str, location='form')
 
         # Check for secure file.
         video_file = request.files["video"]
+        user_id = request.args.get["userId"]
         print("DEBUG: Video file: ", video_file)
         if not secure_filename(video_file.filename):
             return 400, "Invalid file name."
@@ -28,10 +30,11 @@ class Video(Resource):
         if video_file and self.allowed_file(video_file.filename):
             video_filename = secure_filename(video_file.filename)
             # get video id from the filename
-            video_file.save(os.path.join(app.config['UPLOAD_FOLDER'], video_filename))
+            video_file.save(os.path.join(app.config['UPLOAD_FOLDER'] + user_id, video_filename))
 
         # Analyze the video.
-        analysis = VideoAnlyzer.analyze_video(video_filename)
+        video_id = video_filename.split('.')[0]
+        analysis = VideoAnlyzer.analyze_video(user_id, video_id)
 
         # Return the video analysis results.
         return jsonify(analysis)

@@ -3,5 +3,3 @@ __pycache__
 .flaskenv
 config.py
 /uploads
-
-/app/video_analyzer_models
