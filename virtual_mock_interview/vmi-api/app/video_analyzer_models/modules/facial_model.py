@@ -29,13 +29,12 @@ class FacialModel:
     def __init__(self):
         # read config sections
         self.config = ConfigParser()
-        
-        current_file = os.path.abspath(__file__)
-        current_dir = os.path.dirname(current_file)
-        config_path = os.path.join(current_dir, '..', app.config['FACIAL_CONFIG'])
-        model_path = os.path.join(current_dir, '..', app.config['FACIAL_MODEL_JSON'])
-        model_weights = os.path.join(current_dir, '..', app.config['FACIAL_MODEL_WEIGHTS'])
-        
+        config_path = app.config['FACIAL_CONFIG']
+        model_path = app.config['FACIAL_MODEL_JSON']
+        model_weights = app.config['FACIAL_MODEL_WEIGHTS']
+        # config_path = '../../app/video_analyzer_models/config.ini'
+        # model_path = '../../app/video_analyzer_models/models/facial_expression_model_structure.json'
+        # model_weights = '../../app/video_analyzer_models/models/facial_expression_model_weights.h5'
         self.config.read(config_path)
         self.emotion_model = fed.FacialEmotionAnalysis(model_path, model_weights)
         # eyes indexes in mediapipe
@@ -170,6 +169,8 @@ class FacialModel:
         '''
         # get facial emotion analysis
         frame, facial_emotion, energitic = self.facialEmotionAnalysis(frame, DEBUG)
+        facial_emotion = None
+        energitic = None
         # initialize iris position
         iris_pos = None
         # calculate fps
@@ -270,7 +271,8 @@ class FacialModel:
         gray_fr = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         
         # initialize the predicted emotion
-        pred = None
+        pred = []
+        isEnergitic = []
         # detect faces in the frame using the mediapipe FaceDetection model
         with self.mp_face_detection.FaceDetection(model_selection=0, min_detection_confidence=0.5) as face_detection:
             # convert the frame to RGB color space for the face detection model
@@ -278,7 +280,7 @@ class FacialModel:
             results = face_detection.process(frame)
             # if no faces were detected, return the original frame and None
             if(results.detections == None):
-                return orignal_frame, pred
+                return orignal_frame, pred, isEnergitic
             # get the bounding box of the detected face
             x = int(results.detections[0].location_data.relative_bounding_box.xmin * frame.shape[1])
             y = int(results.detections[0].location_data.relative_bounding_box.ymin *  frame.shape[0])
@@ -291,13 +293,12 @@ class FacialModel:
                 roi = cv2.resize(fc, (48, 48))
             except:
                 print("Error resizing the face")
-                return orignal_frame, pred
+                return orignal_frame, pred, isEnergitic
             # predict the emotion of the face
             pred = self.emotion_model.predict_emotion(roi[np.newaxis, :, :, np.newaxis])
             # if pred is either "Sad","Neutral" --> Not Energetic
             # else if  "Happy", "Angry", "Disgust", "Fear", "Surprise" --> Energetic
             # 
-            isEnergitic = None
             if pred in ["Sad","Neutral"]:
                 isEnergitic = "Not Energetic"
             else:

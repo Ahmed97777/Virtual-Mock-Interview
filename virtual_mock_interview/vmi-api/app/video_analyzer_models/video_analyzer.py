@@ -1,24 +1,55 @@
 import cv2
 import os
 import subprocess
-from app import app
+import multiprocessing
 from app.video_analyzer_models.modules.facial_model import FacialModel
 from app.video_analyzer_models.modules.voice_model import VoiceModel
+from app import app
 
-class VideoAnlyzer:
+class VideoAnalyzer:
     @staticmethod
-    def analyze_video(user_id,video_id, DEBUG=False):
+    def analyze_video(interview_id,video_id, DEBUG=False):
 
-        currentDirectory =  os.getcwd()
-        distinationDirectory =app.config['UPLOAD_FOLDER']+'/'+ user_id
-        os.chdir(distinationDirectory)                                                                              
+        voiceModel = VoiceModel()
+                                       
         # using ffmpeg to get audio from the webm video in a parrallel subprocess
         # ffmpeg -i "video_id.webm" -q:a 0 -map a "video_id.wav"
+        os.chdir(f'{app.config["UPLOAD_FOLDER"]}/{interview_id}')
         process1 = subprocess.call(['ffmpeg', '-i', video_id + '.webm', '-q:a', '0', '-map', 'a', video_id + '.wav'])
-        voiceModel = VoiceModel()
+        
+        print("DEBUG: Finished extracting audio from video {}".format(video_id))
+        
         silentTimeStamps, speechTimeStamps, text, simpleFillerDictionary, complexFillerDictionary, mostCommonSimpleFiller, emotionList  = voiceModel.voiceModel(video_id , DEBUG)
+        del voiceModel
+        os.chdir(app.config['BASEDIR'])
+        
+        queue = multiprocessing.Queue()
+        p1 = multiprocessing.Process(target=VideoAnalyzer.analyze_vid_process, args=(queue ,interview_id, video_id, DEBUG))
+        p1.start()
+        p1.join()
+        result_dict = queue.get()
+        
+
+        os.chdir(f'{app.config["UPLOAD_FOLDER"]}/{interview_id}')
+        # merge the audio and video files using ffmpeg
+        # ffmpeg -i video_id.avi -i video_id.wav -c:v copy -c:a  aac  -map 0:v:0 -map 1:a:0 video_id.avi and say yes to overwrite the existing file
+        process2 = subprocess.call(['ffmpeg', '-i', video_id + '.avi', '-i', video_id + '.wav', '-c:v', 'copy', '-c:a', 'aac', '-map', '0:v:0', '-map', '1:a:0', video_id + '-temp.avi'])
+        # delete .avi original file and rename the -temp file to .avi
+        os.remove(video_id + '.avi')
+        os.rename(video_id + '-temp.avi', video_id + '.avi')
+        # change the avi file to webm
+        # ffmpeg -i video_id.avi -c:v libvpx -crf 10 -b:v 1M -c:a libvorbis video_id.webm
+        process3 = subprocess.call(['ffmpeg', '-i', video_id + '.avi', '-c:v', 'libvpx','-crf', '10','-b:v', '1M', '-c:a', 'libvorbis', video_id + '.webm'])
+        os.chdir(app.config['BASEDIR'])
+
+        #return iris_pos_per_frame, facial_emotion_per_frame, energy_per_frame, silentTimeStamps, speechTimeStamps, text, simpleFillerDictionary, complexFillerDictionary, mostCommonSimpleFiller, emotionList
+        return result_dict
+
+    @staticmethod
+    def analyze_vid_process(queue ,interview_id, video_id, DEBUG):
         # load facial model here instead of init to utilize gpu usage
         facialModel = FacialModel()
+        os.chdir(f'{app.config["UPLOAD_FOLDER"]}/{interview_id}')
         # using opencv library to process the video and send the frames to the facial model
         iris_pos_per_frame = []
         facial_emotion_per_frame = []
@@ -34,7 +65,7 @@ class VideoAnlyzer:
                 break
             
             # get the iris position and facial emotion for the current frame
-            iris, emotion, energy, frame = facialModel.facialAnalysis(frame, DEBUG)
+            iris, emotion, energy, frame = facialModel.facialAnalysis(frame, True)
             iris_pos_per_frame.append(iris)
             facial_emotion_per_frame.append(emotion)
             energy_per_frame.append(energy)
@@ -46,51 +77,16 @@ class VideoAnlyzer:
         cv2.destroyAllWindows()
         # delete video_id.webm
         os.remove(video_id + '.webm')
-        
-        # merge the audio and video files using ffmpeg
-        # ffmpeg -i video_id.avi -i video_id.wav -c:v copy -c:a  aac  -map 0:v:0 -map 1:a:0 video_id.avi and say yes to overwrite the existing file
-        process2 = subprocess.call(['ffmpeg', '-i', video_id + '.avi', '-i', video_id + '.wav', '-c:v', 'copy', '-c:a', 'aac', '-map', '0:v:0', '-map', '1:a:0', video_id + '-temp.avi'])
+        del facialModel
+        os.chdir(app.config['BASEDIR'])
+        result_dict = {
+            'iris_pos_per_frame': iris_pos_per_frame,
+            'facial_emotion_per_frame': facial_emotion_per_frame,
+            'energy_per_frame': energy_per_frame
+        } 
+        queue.put(result_dict)
 
-        # delete .avi original file and rename the -temp file to .avi
-        os.remove(video_id + '.avi')
-        os.rename(video_id + '-temp.avi', video_id + '.avi')
-        # change the avi file to webm
-        # ffmpeg -i video_id.avi -c:v libvpx -crf 10 -b:v 1M -c:a libvorbis video_id.webm
-        process3 = subprocess.call(['ffmpeg', '-i', video_id + '.avi', '-c:v', 'libvpx','-crf', '10','-b:v', '1M', '-c:a', 'libvorbis', video_id + '.webm'])
 
-        os.chdir(currentDirectory)
-        print("DEBUG: back to current directory", currentDirectory)
-
-        return iris_pos_per_frame, facial_emotion_per_frame, energy_per_frame, silentTimeStamps, speechTimeStamps, text, simpleFillerDictionary, complexFillerDictionary, mostCommonSimpleFiller, emotionList
-        
-
-# if __name__ == "__main__":
-#     videoPath = '1video'
-#     videoAnalyzer = VideoAnlyzer()
-#     iris_pos_per_frame, facial_emotion_per_frame, energy_per_frame, silentTimeStamps, speechTimeStamps, text, simpleFillerDictionary, complexFillerDictionary, mostCommonSimpleFiller, emotionList = videoAnalyzer.analyze_video(videoPath, DEBUG=True)
-
-#     print("IRIS_POS:   ", iris_pos_per_frame)
-#     print("__________________________________")
-#     print("EMOTIONS:    ", facial_emotion_per_frame)
-#     print("__________________________________")
-#     print("ENERGY:      ", energy_per_frame)
-
-#     print("__________________________________")
-#     print("SILENT:      ", silentTimeStamps)
-#     print("__________________________________")
-#     print("SPEECH:      ", speechTimeStamps)
-#     print("__________________________________")
-#     print("TEXT:        ", text)
-#     print("__________________________________")
-#     print("SIMPLE:      ", simpleFillerDictionary)
-#     print("__________________________________")
-#     print("COMPLEX:     ", complexFillerDictionary)
-#     print("__________________________________")
-#     print("MOST COMMON: ", mostCommonSimpleFiller)
-#     print("__________________________________")
-#     print("EMOTION LIST:", emotionList)
-#     print("__________________________________")
-#     print("__________________________________")
 
 
         

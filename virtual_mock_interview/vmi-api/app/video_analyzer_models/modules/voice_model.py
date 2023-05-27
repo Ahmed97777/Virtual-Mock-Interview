@@ -30,11 +30,9 @@ class VoiceModel:
         self.model_type = model
         # load the models
         #self.speechToTextModel = whisper.load_model(model)
-        print("INFO: loading emotions model")
-        current_file = os.path.abspath(__file__)
-        current_dir = os.path.dirname(current_file)
-        model_path = os.path.join(current_dir, '..', app.config['VOICE_MODEL_PKL'])
-        self.emotion_model = pickle.load(open('../models/speech_emotion_analysis.pkl', 'rb'))
+        pkl_model_path = app.config['VOICE_MODEL_PKL']
+        #pkl_model_path = '../../app/video_analyzer_models/models/speech_emotion_analysis.pkl'
+        self.emotion_model = pickle.load(open(pkl_model_path, 'rb'))
         print("INFO: model loaded")
         
     
@@ -197,15 +195,17 @@ class VoiceModel:
 
     def voiceModel(self, video_id, DEBUG=False):
         
-
-        audio_file = "{}.wav".format(video_id)
-        
         #create parallel subprocess to execute whisper model
-        process = subprocess.Popen(["whisper", audio_file,"--model", self.model_type, "--language", "en"])
-        silentTimeStamps, speechTimeStamps, audio, audioFiles = self.audio_prepocessing(audio_file, DEBUG=DEBUG)
+        #process = subprocess.Popen(["cd",  user_id, "&&","whisper", audio_file,"--model", self.model_type, "--language", "en", "&&", "cd", "../.."])
+        # go to user directory and run whisper model
+   
+        process = subprocess.call(["whisper","{}.wav".format(video_id), "--model", self.model_type, "--language", "en"])
+        
+
+        silentTimeStamps, speechTimeStamps, audio, audioFiles = self.audio_prepocessing("{}.wav".format(video_id), DEBUG=DEBUG)
         # emotion analysis
         emotionList = self.speech_emotion_analysis(audioFiles, DEBUG)
-        process.wait()
+        
         # read text file
         text = open("{}.txt".format(video_id), "r").read()
         simpleFillerDictionary, complexFillerDictionary, mostCommonSimpleFiller =  self.analyze_text(text, DEBUG)
@@ -221,16 +221,8 @@ class VoiceModel:
         # Write the modified contents to the VTT file
         with open('{}.vtt'.format(video_id), 'w') as f:
             f.write(vtt_contents)
-        
         # return all the analyzed information
         return silentTimeStamps, speechTimeStamps, text, simpleFillerDictionary, complexFillerDictionary, mostCommonSimpleFiller, emotionList
-
-
-# #-------------------for testing the model----------------------- #
-# if __name__=="__main__":
-#     folder_id = "1video"
-#     obj = VoiceModel("small.en") 
-#     obj.voiceModel(folder_id, DEBUG=True)
 
 
     
