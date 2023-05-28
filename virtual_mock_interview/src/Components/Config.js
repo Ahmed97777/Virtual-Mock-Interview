@@ -3,6 +3,11 @@ import { Link } from "react-router-dom"
 import Webcam from "react-webcam";
 
 const Config = () => {
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
+
     const webcamRef = useRef(null);
     const audioFlag = false
 
