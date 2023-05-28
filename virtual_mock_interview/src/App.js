@@ -15,6 +15,9 @@ import Report from "./Components/Report";
 function App() {
   return (
     <div className="App">
+
+      {/* A Header that will always be there */}
+      <Header/>
       
       <div className="the-main" >  
 
@@ -22,7 +25,7 @@ function App() {
       <BrowserRouter>
         <Routes>
 
-          <Route  path="/" element= {<div><Header/><Landing/><HomeMain/></div>} />
+          <Route  path="/" element= {<div><Landing/><HomeMain/></div>} />
           <Route  path="/configuration" element= {<Config/>} />
           <Route  path="/field" element= {<Field/>} />
           <Route  path="/example-case" element= {<ExampleCase/>} />
@@ -30,7 +33,7 @@ function App() {
           <Route  path="/report" element= {<Report/>} />
           {/* just for test */}
           {/* <Route  path="/report" element= {<VideoApi/>} /> */} 
-          <Route  path="*" element= {<div><Header/><NotFound/></div>} />
+          <Route  path="*" element= {<div><NotFound/></div>} />
 
         </Routes>
       </BrowserRouter>

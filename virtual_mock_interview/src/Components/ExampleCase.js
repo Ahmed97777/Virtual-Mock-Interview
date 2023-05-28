@@ -19,12 +19,6 @@ const ExampleCase = () => {
 
         <>
         
-        
-            <div className="logo-container-for-config" >
-                <div className="top-logo-menu-for-config" >
-                    <a className="logo-name-for-config" href="/" >VMI</a>
-                </div>
-            </div>
             
             <div className="instructions-parent" >
                 

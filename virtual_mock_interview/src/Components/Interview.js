@@ -268,6 +268,25 @@ const Interview = () => {
     // ------------------------------------------------------------
 
 
+    useEffect(() => {
+        console.log("we are inside reload effect", counter);
+        
+        const handleBeforeUnload = (event) => {
+        if (counter !== 0) {
+            event.preventDefault();
+            event.returnValue = '';
+            return 'Can not perform this action now';
+        }
+        };
+    
+        window.addEventListener('beforeunload', handleBeforeUnload);
+    
+        return () => {
+        window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+    }, [counter]);
+
+
     function MajorFunction() {
 
             if (counter === 0) {
@@ -330,18 +349,6 @@ const Interview = () => {
     return (
         
         <>
-
-            {/* <Webcam audio={true} ref={webcamRef} /> */}
-            {/* <Webcam audio={true} ref={webcamRef} muted={true} style={{ display: 'none' }} /> */}
-
-
-            <div className="logo-container-for-config" >
-                <div className="top-logo-menu-for-config" >
-                    <a className="logo-name-for-config logo-name-for-interview" href="/" >VMI</a>
-                </div>
-            </div>
-
-            
 
             <div className="instructions-parent instructions-parent-for-interview" >
                 

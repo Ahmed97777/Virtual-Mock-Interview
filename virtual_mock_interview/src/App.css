@@ -800,7 +800,7 @@ background-color: var(--background-color);
 }
 
 .report-container {
-    height: 600px;
+    height: 200px;
 }
 
 @media(max-width:800px) {
@@ -944,3 +944,33 @@ input:checked + .slider:before {
     margin-right: 15px;
 }
 /* ---- end of toggle slider style */
+
+/* starting loading report page style */
+/* CSS Progress bar */
+.wrapper {
+    width: 600px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 0px auto;
+}
+.progress-bar {
+    width: 100%;
+    background-color: whitesmoke;
+    padding: 2px;
+}
+.progress-bar-fill {
+    display: block;
+    height: 40px;
+    background-color: #65ef88;
+    border-radius: 3px;
+    width: 0%; /* Starts at 0%, updates with download progress */
+    transition: width 30ms ease-in-out;
+}
+.progress-text {
+    font-size: 1.5rem;
+    padding: 10px;
+}
+
+/* end of loading report page style */
