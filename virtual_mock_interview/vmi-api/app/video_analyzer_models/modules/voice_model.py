@@ -21,17 +21,16 @@ class VoiceModel:
         Args:
             model (str): language model to be used for speech-to-text conversion.
         '''
+
         # list of fillers to be checked in the model
         self.fillers = ['well', 'like', 'actually', 'basically', 'seriously', 'literally', 'totally','right', 'umm', 'um', 'uh', 'hmm', 'okay', 'ok','actually', 'honestly', 'yeah', 'yep', 'right' ]
         self.complex_fillers = ['i guess','i suppose','believe me','you know what i mean','i mean','you see','you know','at the end of the day']
-
-        self.samplerate_librosa = 0
+        
         self.samplerate_soundFile = 0
         self.model_type = model
-        # load the models
-        #self.speechToTextModel = whisper.load_model(model)
+        # load the emotion recognition model
         pkl_model_path = app.config['VOICE_MODEL_PKL']
-        #pkl_model_path = '../../app/video_analyzer_models/models/speech_emotion_analysis.pkl'
+
         self.emotion_model = pickle.load(open(pkl_model_path, 'rb'))
         print("INFO: model loaded")
         
@@ -46,18 +45,16 @@ class VoiceModel:
         Returns:
             silentTimeStamps (List): A list of timestamps of silent segments in the audio file.
             speechTimeStamps (List): A list of timestamps of speech segments in the audio file.
-            audio_librosa (np.ndarray): The audio file as a numpy n dimensional array
             audioFiles (list of np.ndarray): The audio files list where each item is a numpy n dimensional array but with different sampling rate than librosa sampling.
         '''
         try:
             # call the audio_prepocessing slicing functions
-            audio_librosa, sr_librosa, silentTimeStamps, speechTimeStamps = ap.sliceAudioFile(audio_path)
-            self.samplerate_librosa = sr_librosa
+            silentTimeStamps, speechTimeStamps = ap.sliceAudioFile(audio_path)
             audioFiles, sr_soundFile = ap.slicingForEmotionDetection(audio_path, speechTimeStamps)
             self.samplerate_soundFile = sr_soundFile
         except:
             print("ERROR: audio_prepocessing, failed to slice audio file")
-            return None, None, None, None
+            return None, None, None
         if DEBUG:
             print("DEBUG: silentTimeStamps",silentTimeStamps)
             print("DEBUG: speechTimeStamps",speechTimeStamps)
@@ -68,7 +65,7 @@ class VoiceModel:
             print("DEBUG: sr_soundFile",sr_soundFile)
             print("DEBUG: audioFiles[0] type ", type(audioFiles[0]))
             print("DEBUG: audioFiles[0] shape ", audioFiles[0].shape)
-        return silentTimeStamps, speechTimeStamps, audio_librosa, audioFiles
+        return silentTimeStamps, speechTimeStamps, audioFiles
  
 
     def analyze_text(self, text, DEBUG=False):
@@ -124,7 +121,8 @@ class VoiceModel:
         Returns:
             emotionResults (list): A list of the predicted emotions for each audio file in audioFiles.
         '''
-        emotionResults = []
+        voice_emotions = []
+        voice_tone = []
         # Iterate through audio files
         for file in audioFiles:
             try:
@@ -132,14 +130,22 @@ class VoiceModel:
                 features = self.extract_feature(file, mfcc=True, chroma=True, mel=True)
                 # Predict emotion using pre-trained model
                 result = self.emotion_model.predict(features.reshape(1, -1))
-                emotionResults.append(result[0])
+                print("INFO: result",result)
+                voice_emotions.append(result[0])
+                # Predict tone using pre-trained model
+                if result[0] != 'sad':
+                    tone = 'Non monotone'
+                else:
+                    tone = 'Monotone'
+                voice_tone.append(tone)
                 
-            except:
-                print('ERROR: failed to extract features and predict emotion at time stamp', speechTimeStamp)
+            except Exception as e:
+                print('ERROR: failed to extract features and predict emotion at time stamp')
+                print(e)
                 continue
         if DEBUG:
-            print("DEBUG: emotionResults",emotionResults)
-        return emotionResults
+            print("DEBUG: voice_emotions",voice_emotions)
+        return voice_emotions, voice_tone
 
 
     def extract_feature(self, audio, **kwargs):
@@ -198,18 +204,32 @@ class VoiceModel:
         #create parallel subprocess to execute whisper model
         #process = subprocess.Popen(["cd",  user_id, "&&","whisper", audio_file,"--model", self.model_type, "--language", "en", "&&", "cd", "../.."])
         # go to user directory and run whisper model
-   
-        process = subprocess.call(["whisper","{}.wav".format(video_id), "--model", self.model_type, "--language", "en"])
-        
+        try:
+            process = subprocess.call(["whisper","{}.wav".format(video_id), "--model", self.model_type, "--language", "en"])
+        except Exception as e:
+            print("ERROR: failed to run whisper model")
+            print(e)
+            return
 
-        silentTimeStamps, speechTimeStamps, audio, audioFiles = self.audio_prepocessing("{}.wav".format(video_id), DEBUG=DEBUG)
+        silentTimeStamps, speechTimeStamps, audioFiles = self.audio_prepocessing("{}.wav".format(video_id), DEBUG=DEBUG)
         # emotion analysis
-        emotionList = self.speech_emotion_analysis(audioFiles, DEBUG)
+        voice_emotions, voice_tone = self.speech_emotion_analysis(audioFiles, DEBUG)
         
         # read text file
-        text = open("{}.txt".format(video_id), "r").read()
+        with open('{}.txt'.format(video_id), 'r') as f:
+            text = f.read()
+        # analyze text
         simpleFillerDictionary, complexFillerDictionary, mostCommonSimpleFiller =  self.analyze_text(text, DEBUG)
-        # highligh the filler words in the text
+        highlightedText = text
+        # highlight the filler words in the text
+        for word in self.fillers:
+            highlightedText = highlightedText.replace(word, '<span style="color: red; text-decoration: underline;">{}</span>'.format(word))
+        for cmplx in self.complex_fillers:
+            highlightedText = highlightedText.replace(cmplx, '<span style="color: red; text-decoration: underline;">{}</span>'.format(cmplx))
+        
+
+
+
         # Open the VTT file and read its contents
         with open('{}.vtt'.format(video_id), 'r') as f:
             vtt_contents = f.read()
@@ -222,7 +242,16 @@ class VoiceModel:
         with open('{}.vtt'.format(video_id), 'w') as f:
             f.write(vtt_contents)
         # return all the analyzed information
-        return silentTimeStamps, speechTimeStamps, text, simpleFillerDictionary, complexFillerDictionary, mostCommonSimpleFiller, emotionList
+        return {    "silentTimeStamps":silentTimeStamps,
+                    "speechTimeStamps":speechTimeStamps,
+                    "text":text,
+                    "highlightedText": highlightedText,
+                    "simpleFillerDictionary":simpleFillerDictionary,
+                    "complexFillerDictionary":complexFillerDictionary,
+                    "mostCommonSimpleFiller":mostCommonSimpleFiller,
+                    "voice_emotions":voice_emotions,
+                    "voice_tone":voice_tone
+                }
 
 
     

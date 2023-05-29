@@ -56,6 +56,7 @@ class FacialModel:
         # load emotion model
         self.DEBUG = False
 
+
     def euclideanDistance(self, p1: list, p2: list):
         '''
         Calculate the Euclidean distance between two points in a two-dimensional space.
@@ -156,7 +157,7 @@ class FacialModel:
         cv2.destroyAllWindows()
         return iris_pos_per_frame, facial_emotion_per_frame
 
-    def facialAnalysis(self, frame, DEBUG= False):
+    def facialAnalysis(self, frame, oldEmotion, oldEnergy, frameCounter, DEBUG= False):
         '''
         Detects and analyse person's facial landmarks in real-time using the computer's webcam.
 
@@ -168,11 +169,11 @@ class FacialModel:
             tuple: A tuple containing two values: iris_pos and facial_emotion. 
         '''
         # get facial emotion analysis
-        frame, facial_emotion, energitic = self.facialEmotionAnalysis(frame, DEBUG)
-        facial_emotion = None
-        energitic = None
-        # initialize iris position
-        iris_pos = None
+        
+            
+        frame, facial_emotion, energitic = self.facialEmotionAnalysis(frame, oldEmotion, oldEnergy, frameCounter, DEBUG)
+            
+        
         # calculate fps
         frame_count = 0
         start_time = time.time()
@@ -228,6 +229,11 @@ class FacialModel:
                              (255, 255, 255),
                             1
                         )
+                else:
+                    # no face detected
+                    iris_pos = "Not detected"
+                    iris_ratio ="Not detected"
+                    nose_to_eye_ratio = "Not detected"
                         
                 frame_count += 1
                 #calculate fps
@@ -256,7 +262,7 @@ class FacialModel:
 
         return iris_pos, facial_emotion, energitic, frame
 
-    def facialEmotionAnalysis(self, frame, DEBUG = False):
+    def facialEmotionAnalysis(self, frame, oldEmotion, oldEnergy, frameCounter, DEBUG = False):
         '''
         Analyzes the facial emotion of the given frame using the pre-trained EmotionModel and mediapipe FaceDetection model.
         Args:
@@ -270,9 +276,6 @@ class FacialModel:
         # convert the frame to grayscale
         gray_fr = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         
-        # initialize the predicted emotion
-        pred = []
-        isEnergitic = []
         # detect faces in the frame using the mediapipe FaceDetection model
         with self.mp_face_detection.FaceDetection(model_selection=0, min_detection_confidence=0.5) as face_detection:
             # convert the frame to RGB color space for the face detection model
@@ -280,7 +283,7 @@ class FacialModel:
             results = face_detection.process(frame)
             # if no faces were detected, return the original frame and None
             if(results.detections == None):
-                return orignal_frame, pred, isEnergitic
+                return orignal_frame, oldEmotion, oldEnergy
             # get the bounding box of the detected face
             x = int(results.detections[0].location_data.relative_bounding_box.xmin * frame.shape[1])
             y = int(results.detections[0].location_data.relative_bounding_box.ymin *  frame.shape[0])
@@ -293,19 +296,26 @@ class FacialModel:
                 roi = cv2.resize(fc, (48, 48))
             except:
                 print("Error resizing the face")
-                return orignal_frame, pred, isEnergitic
+                return orignal_frame, oldEmotion, oldEnergy
+
+
+            if frameCounter % 24 != 0:
+                print("DEBUG: frameCounter % 24 != 0 :  ", frameCounter)
+                cv2.putText(orignal_frame, oldEnergy, (x-2, y-10), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 0), 2)
+                cv2.rectangle(orignal_frame,(x,y),(x+w,y+h),(255, 255, 0), 2)
+                return orignal_frame, oldEmotion, oldEnergy
+            
+            
             # predict the emotion of the face
             pred = self.emotion_model.predict_emotion(roi[np.newaxis, :, :, np.newaxis])
             # if pred is either "Sad","Neutral" --> Not Energetic
             # else if  "Happy", "Angry", "Disgust", "Fear", "Surprise" --> Energetic
             # 
-            if pred in ["Sad","Neutral"]:
+            if pred in ["Sad"]:
                 isEnergitic = "Not Energetic"
             else:
                 isEnergitic = "Energetic"
 
-            # draw the bounding box and the predicted emotion on the original frame
-            if DEBUG:
                 cv2.putText(orignal_frame, isEnergitic, (x-2, y-10), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 0), 2)
                 cv2.rectangle(orignal_frame,(x,y),(x+w,y+h),(255, 255, 0), 2)
         return orignal_frame, pred, isEnergitic
