@@ -213,7 +213,7 @@ const Interview = () => {
     // ------------------------------------------------------------
     
 
-    const [timeRemaining, setTimeRemaining] = useState(20);
+    const [timeRemaining, setTimeRemaining] = useState(60*2);
     const [displayTimer, setDisplayTimer] = useState(false);
 
     const [displayRunningLate, setDisplayRunningLate] = useState(false);
@@ -225,7 +225,7 @@ const Interview = () => {
     };
 
     const handleResetClick = () => {
-        setTimeRemaining(20);
+        setTimeRemaining(60*2);
         setDisplayTimer(true);
         console.log(displayTimer);
     };
