@@ -3,7 +3,6 @@ from werkzeug.utils import secure_filename
 from werkzeug.datastructures import FileStorage
 from flask_restful import Resource, reqparse
 from app import app
-import os
 import re
 
 ALLOWED_EXTENSIONS = {'mp4', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm'}
@@ -14,16 +13,18 @@ class Video(Resource):
         self.parser = reqparse.RequestParser()
         self.parser.add_argument('video', type=FileStorage, location='files')
 
+    
+    def post(self):
+        # Get the video file from the request body.
+        if 'video' not in request.files:
+            return "No video file found.", 400
 
         # Check for secure file.
         video_file = request.files["video"]
         if not secure_filename(video_file.filename):
-            return 400, "Invalid file name."
+            return "Invalid file name.",  400
 
-    def post(self):
-        # Get the video file from the request body.
-        if 'video' not in request.files:
-            return 400, "No video file found."
+
         video_file = request.files["video"]
         if video_file and self.allowed_file(video_file.filename):
             video_filename = secure_filename(video_file.filename)
@@ -46,11 +47,11 @@ class Video(Resource):
             app.config['video_queue_manager'].add_video(interview_id, video_id)
 
             # Return the video analysis results.
-            return jsonify({'msg': ' video {} added to queue'.format(video_id)})
+            return ' video {} added to queue'.format(video_id), 200
         else:
             # Release the lock if the video is invalid
             video_queue_manager.processing_lock.release()
-            return 400, "Invalid file format."  
+            return "Invalid file format.", 400
         
     def allowed_file(self, filename):
         return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS

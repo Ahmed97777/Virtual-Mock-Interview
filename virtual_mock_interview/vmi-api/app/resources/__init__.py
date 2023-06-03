@@ -5,4 +5,4 @@ from app import api
 
 api.add_resource(Questions, '/questions')
 api.add_resource(Video, '/video')
-# api.add_resource(Report, '/report')
+api.add_resource(Report, '/report')
