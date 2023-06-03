@@ -160,7 +160,7 @@ const Interview = () => {
             type: "video/webm"
         });
         const formData = new FormData();
-        formData.append("video", blob, `${userId}_${jobField}_${counter - 1}_video.webm`);
+        formData.append("video", blob, `${userId}_${counter - 1}_video.webm`);
         axios.post(`http://127.0.0.1:5000/video`, formData)
             .then(response => {
             console.log(response.data);
