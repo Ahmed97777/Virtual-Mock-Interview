@@ -541,6 +541,7 @@ background-color: var(--background-color);
     margin-bottom: 35px;
     padding: 15px;
     transition: 0.2s;
+    cursor: pointer;
 }
 
 .field-container button:hover {
@@ -800,7 +801,7 @@ background-color: var(--background-color);
 }
 
 .report-container {
-    height: 200px;
+    height: 50px;
 }
 
 @media(max-width:800px) {
@@ -963,7 +964,7 @@ input:checked + .slider:before {
 .progress-bar-fill {
     display: block;
     height: 40px;
-    background-color: #65ef88;
+    background-color: #0d5d85;
     border-radius: 3px;
     width: 0%; /* Starts at 0%, updates with download progress */
     transition: width 30ms ease-in-out;
@@ -974,3 +975,48 @@ input:checked + .slider:before {
 }
 
 /* end of loading report page style */
+
+/* styles in loading and data visu in Report.js */
+.vis-container {
+    position: relative;
+}
+
+.vis-img-cont-par {
+    margin-top: 60px;
+    padding-left: 80px;
+    padding-right: 80px;
+}
+
+.vis-img-cont {
+    max-width: 300px;
+    max-height: 300px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    background-color: #565656;
+}
+
+.visu-video {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.visu-hr {
+    border: none;
+    height: 2px;
+    background-color: #264996;
+    margin: 20px 0;
+}
+
+.video-containerrrr {
+    width: 100%;
+    max-width: 800px;
+}
+
+.vis-img {
+    max-width: 300px;
+    max-height: 300px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+/* styles in loading and data visu in Report.js */
