@@ -5,13 +5,14 @@ import multiprocessing
 from app.video_analyzer_models.modules.facial_model import FacialModel
 from app.video_analyzer_models.modules.voice_model import VoiceModel
 from app import app
+import pickle
 
 class VideoAnalyzer:
     @staticmethod
     def analyze_video(interview_id,video_id, DEBUG=False):
 
         voiceModel = VoiceModel()
-                                       
+        result_dict = {}            
         # using ffmpeg to get audio from the webm video in a parrallel subprocess
         # ffmpeg -i "video_id.webm" -q:a 0 -map a "video_id.wav"
         os.chdir(f'{app.config["UPLOAD_FOLDER"]}/{interview_id}')
@@ -19,7 +20,7 @@ class VideoAnalyzer:
         
         print("DEBUG: Finished extracting audio from video {}".format(video_id))
         
-        silentTimeStamps, speechTimeStamps, text, simpleFillerDictionary, complexFillerDictionary, mostCommonSimpleFiller, emotionList  = voiceModel.voiceModel(video_id , DEBUG)
+        result_dict.update(voiceModel.voiceModel(video_id , DEBUG))
         del voiceModel
         os.chdir(app.config['BASEDIR'])
         
@@ -27,7 +28,7 @@ class VideoAnalyzer:
         p1 = multiprocessing.Process(target=VideoAnalyzer.analyze_vid_process, args=(queue ,interview_id, video_id, DEBUG))
         p1.start()
         p1.join()
-        result_dict = queue.get()
+        result_dict.update(queue.get())
         
 
         os.chdir(f'{app.config["UPLOAD_FOLDER"]}/{interview_id}')
@@ -37,13 +38,19 @@ class VideoAnalyzer:
         # delete .avi original file and rename the -temp file to .avi
         os.remove(video_id + '.avi')
         os.rename(video_id + '-temp.avi', video_id + '.avi')
-        # change the avi file to webm
-        # ffmpeg -i video_id.avi -c:v libvpx -crf 10 -b:v 1M -c:a libvorbis video_id.webm
-        process3 = subprocess.call(['ffmpeg', '-i', video_id + '.avi', '-c:v', 'libvpx','-crf', '10','-b:v', '1M', '-c:a', 'libvorbis', video_id + '.webm'])
+        # change the avi file to mp4
+        # ffmpeg -i input_filename.avi -c:v copy -c:a copy -y output_filename.mp4
+        process3 = subprocess.call(['ffmpeg', '-i', video_id + '.avi', '-c:v', 'copy', '-c:a', 'copy', '-y', video_id + '.mp4'])
+        # # ffmpeg -i video_id.avi -c:v libvpx -crf 10 -b:v 1M -c:a libvorbis video_id.webm
+        # process3 = subprocess.call(['ffmpeg', '-i', video_id + '.avi', '-c:v', 'libvpx','-crf', '10','-b:v', '1M', '-c:a', 'libvorbis', video_id + '.webm'])
+        
+        # create a pickle file to store the result dictionary
+        with open(video_id + '.pkl', 'wb+') as f:
+            pickle.dump(result_dict, f, pickle.HIGHEST_PROTOCOL)
+        
         os.chdir(app.config['BASEDIR'])
 
-        #return iris_pos_per_frame, facial_emotion_per_frame, energy_per_frame, silentTimeStamps, speechTimeStamps, text, simpleFillerDictionary, complexFillerDictionary, mostCommonSimpleFiller, emotionList
-        return result_dict
+        return
 
     @staticmethod
     def analyze_vid_process(queue ,interview_id, video_id, DEBUG):
@@ -54,6 +61,12 @@ class VideoAnalyzer:
         iris_pos_per_frame = []
         facial_emotion_per_frame = []
         energy_per_frame = []
+        
+        iris= ""
+        emotion = ""
+        energy = ""
+        frameCounter = 0
+
         fourcc = cv2.VideoWriter_fourcc(*'XVID')
         cap = cv2.VideoCapture(video_id + '.webm')
         # creating video writer to write the output video: the output video extension is avi so that ffmepeg can merge it later with the audio with no need for additional configurations
@@ -65,7 +78,8 @@ class VideoAnalyzer:
                 break
             
             # get the iris position and facial emotion for the current frame
-            iris, emotion, energy, frame = facialModel.facialAnalysis(frame, True)
+            iris, emotion, energy, frame = facialModel.facialAnalysis(frame, emotion, energy, frameCounter, True)
+            frameCounter += 1
             iris_pos_per_frame.append(iris)
             facial_emotion_per_frame.append(emotion)
             energy_per_frame.append(energy)
@@ -85,6 +99,7 @@ class VideoAnalyzer:
             'energy_per_frame': energy_per_frame
         } 
         queue.put(result_dict)
+        return
 
 
 

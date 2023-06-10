@@ -27,7 +27,7 @@ def sliceAudioFile(AudioFilePath):
         timeStamps.append([xt[i][0]/sr, xt[i][1]/sr])
     # if no time stamps then return the whole audio file
     if len(timeStamps) == 0:
-        return x, sr, [], [[0.0, timeStamps[-1][1]]]
+        return [], [[0.0, timeStamps[-1][1]]]
     
     # get the silent time stamps
     for i in range(len(timeStamps)-1):
@@ -37,7 +37,7 @@ def sliceAudioFile(AudioFilePath):
 
     # if no silent time stamps then return the whole audio file
     if len(silentStamps) == 0:
-        return x, sr, [], [[0.0, timeStamps[-1][1]]]
+        return  [], [[0.0, timeStamps[-1][1]]]
     
     # check if the first frame is silent
     if not silentStamps[0][0] == 0.0:
@@ -49,7 +49,7 @@ def sliceAudioFile(AudioFilePath):
     if not silentStamps[-1][1] == timeStamps[-1][1]:
         speechStamps.append([silentStamps[-1][1], timeStamps[-1][1]])
 
-    return x, sr, silentStamps, speechStamps
+    return silentStamps, speechStamps
 
 
 def slicingForEmotionDetection(audio_path, speechTimeStamps):
