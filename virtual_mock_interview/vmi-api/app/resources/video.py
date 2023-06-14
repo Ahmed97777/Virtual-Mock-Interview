@@ -4,6 +4,7 @@ from werkzeug.datastructures import FileStorage
 from flask_restful import Resource, reqparse
 from app import app
 import re
+import os
 
 ALLOWED_EXTENSIONS = {'mp4', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm'}
 
@@ -33,8 +34,11 @@ class Video(Resource):
             # create dir of user_id if not exist
             # if video contains 1_video then create dir of user id
             isFirstFile = re.search(r'1_video', video_filename)
-            if isFirstFile is not None:
-                os.mkdir(app.config['UPLOAD_FOLDER']+ '/' + interview_id)
+            if isFirstFile:
+                if os.getcwd() == app.config['BASEDIR']:
+                    os.mkdir(app.config['UPLOAD_FOLDER']+ '/' + interview_id)
+                else:
+                    os.mkdir('../{}'.format(interview_id))
             # save video to the dir of interview_id even if we are in it
             if os.getcwd().split('/')[-1] == interview_id:
                 video_file.save(video_filename)
@@ -42,15 +46,13 @@ class Video(Resource):
                 video_file.save(app.config['UPLOAD_FOLDER'] + '/'+ interview_id + '/' + video_filename)
             
 
-            # Analyze the video asynchronously.
+            # pass video to the queue to be processed.
             video_id = video_filename.split('.')[0]
             app.config['video_queue_manager'].add_video(interview_id, video_id)
 
-            # Return the video analysis results.
+            # Return video is being processed .
             return ' video {} added to queue'.format(video_id), 200
         else:
-            # Release the lock if the video is invalid
-            video_queue_manager.processing_lock.release()
             return "Invalid file format.", 400
         
     def allowed_file(self, filename):

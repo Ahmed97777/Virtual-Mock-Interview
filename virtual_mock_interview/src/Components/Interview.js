@@ -51,16 +51,18 @@ const Interview = () => {
     };
 
 
-    const [userId, setUserId] = useState('');
+    const [interviewId, setInterviewId] = useState('');
 
     useEffect(() => {
-        const generatedUserId = uuidv4(); // Generate a random user ID
-        setUserId(generatedUserId);
+        const generatedInterviewId = uuidv4(); // Generate a random user ID
+        setInterviewId(generatedInterviewId);
+        setCookie('interview_id', generatedInterviewId, { path: '/' });
+        
     }, []);
 
 
 
-    const [cookies] = useCookies(['job-field']);
+    const [cookies, setCookie] = useCookies(['job-field', 'interview_id']);
     const jobField = cookies['job-field'];
     const [questions, setQuestions] = useState([]);
 
@@ -160,7 +162,7 @@ const Interview = () => {
             type: "video/webm"
         });
         const formData = new FormData();
-        formData.append("video", blob, `${userId}_${counter - 1}_video.webm`);
+        formData.append("video", blob, `${interviewId}_${counter - 1}_video.webm`);
         axios.post(`http://127.0.0.1:5000/video`, formData)
             .then(response => {
             console.log(response.data);
