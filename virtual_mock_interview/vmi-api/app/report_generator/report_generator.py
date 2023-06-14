@@ -2,6 +2,7 @@ import matplotlib
 matplotlib.use('agg') # to use matplotlib without gui support
 
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator
 import numpy as np
 import pandas as pd
 import librosa
@@ -15,21 +16,16 @@ from app import app
 class ReportGenerator:
     @staticmethod
     def generate_report(interviewId: str, videoId: str):
-        try:
-            os.chdir(app.config['UPLOAD_FOLDER'] + '/' + interviewId)
-        except FileNotFoundError:
-            return {'msg': 'Interview ID not found.'}
-        
-        print
         # wait for video to be processed
         text = {}
         highlighted_text = {}
-        if not os.path.isfile(interviewId + videoId + '.pkl'):
+        path_to_file = app.config['UPLOAD_FOLDER'] + '/' + interviewId + '/'
+        if not os.path.isfile(path_to_file + interviewId + videoId + '.pkl'):
             return {'msg': 'Video ID not found.'}
         else:
             i = int(videoId[1])
-            df = pd.read_pickle(interviewId + videoId+'.pkl')
-            y, sr = librosa.load(interviewId + videoId + '.wav')
+            df = pd.read_pickle(path_to_file + interviewId + videoId+'.pkl')
+            y, sr = librosa.load(path_to_file + interviewId + videoId + '.wav')
             seconds = librosa.get_duration(y=y, sr=sr)
             framerate = int(len(df['iris_pos_per_frame']) / seconds)
             # lower the length of iris_pos_per_frame,  facial_emotion_per_frame, energy_per_frame to be per second instead of per frame
@@ -40,29 +36,29 @@ class ReportGenerator:
             highlighted_text.update({i:df['highlightedText']})
             
             # plot the speech and silence of the question
-            ReportGenerator.plot_speech(y, sr, df['silentTimeStamps'], df['speechTimeStamps'],i,0)
+            ReportGenerator.plot_speech(y, sr, df['silentTimeStamps'], df['speechTimeStamps'], path_to_file,i,0)
             #plot fillers of the question
-            ReportGenerator.plot_fillers(df['simpleFillerDictionary'], df['complexFillerDictionary'], i, 1)
+            ReportGenerator.plot_fillers(df['simpleFillerDictionary'], df['complexFillerDictionary'],path_to_file,  i, 1)
             
             # add energy_val, focus_val, voice_tone_val to lite_df
-            lite_df.update(ReportGenerator.category_to_number(lite_df['energy_per_second'],lite_df['focus_per_second'], lite_df['voice_tone_per_second']))
+            lite_df.update(ReportGenerator.category_to_number(lite_df['energy_prob_per_second'],lite_df['focus_per_second'], lite_df['voice_tone_per_second']))
             # plot the energy, focus, voice_tone of the question
-            ReportGenerator.plot_plot(ReportGenerator.lpf(lite_df['energy_val'], 0.9), ReportGenerator.lpf(lite_df['focus_val'],0.9), ReportGenerator.lpf(lite_df['tone_val'],0.9), i, 2)
+            ReportGenerator.plot_plot(ReportGenerator.lpf(lite_df['energy_val'], 0.8), ReportGenerator.lpf(lite_df['focus_val'],0.8), ReportGenerator.lpf(lite_df['tone_val'],0.8),path_to_file, i, 2)
             # plot the iris tracking of the question
-            ReportGenerator.plot_iris(lite_df['iris_pos_per_second'], i, 3)
+            ReportGenerator.plot_iris(lite_df['iris_pos_per_second'],path_to_file, i, 3)
             # plot the radar of the question
             ReportGenerator.plot_radar(
                 lite_df['facial_emotion_per_second'], 
                 lite_df['energy_per_second'], 
                 lite_df['focus_per_second'], 
                 lite_df['voice_tone_per_second'],
-                ReportGenerator.lpf(lite_df['energy_val'], 0.9), 
-                ReportGenerator.lpf(lite_df['focus_val'],0.9), 
-                ReportGenerator.lpf(lite_df['tone_val'],0.9),  
+                ReportGenerator.lpf(lite_df['energy_val'], 0.8), 
+                ReportGenerator.lpf(lite_df['focus_val'],0.8), 
+                ReportGenerator.lpf(lite_df['tone_val'],0.8),
+                path_to_file,
                 i, 
                 4)
             print('DEBUG: done with ' + videoId)
-        os.chdir(app.config['BASEDIR'])
         return {'msg': 'success',
                 'text': text,
                 'highlighted_text': highlighted_text
@@ -75,21 +71,26 @@ class ReportGenerator:
         # lower the length of iris_pos_per_frame,  facial_emotion_per_frame, energy_per_frame to be per second instead of per frame
         iris_pos_per_second = []
         facial_emotion_per_second = []
+        facial_emotion_prob_per_second = []
         voice_emotion_per_second = []
 
         focus_per_second = []
         energy_per_second = []
+        energy_prob_per_second = []
         voice_tone_per_second = []
 
-        test_list = [0, 1,2, 3, 4, 5, 6, 7, 8, 9,10, 11, 12]
         for i in range(0, len(df['iris_pos_per_frame']), framerate):
             iris_window = df['iris_pos_per_frame'][i:i+framerate]
             emotion_window = df['facial_emotion_per_frame'][i:i+framerate]
+            emotion_prob_window = df['facial_emotion_prob_per_frame'][i:i+framerate]
             energy_window = df['energy_per_frame'][i:i+framerate]
+            energy_prob_window = df['energy_prob_per_frame'][i:i+framerate]
 
             iris_pos_per_second.append(Counter(iris_window).most_common(1)[0][0])
             facial_emotion_per_second.append(Counter(emotion_window).most_common(1)[0][0])
+            facial_emotion_prob_per_second.append(Counter(emotion_prob_window).most_common(1)[0][0])
             energy_per_second.append(Counter(energy_window).most_common(1)[0][0])
+            energy_prob_per_second.append(Counter(energy_prob_window).most_common(1)[0][0])
 
         for i in iris_pos_per_second:
             if i == 'center':
@@ -114,13 +115,15 @@ class ReportGenerator:
         return {
             'iris_pos_per_second': iris_pos_per_second,
             'facial_emotion_per_second': facial_emotion_per_second,
+            'facial_emotion_prob_per_second': facial_emotion_prob_per_second,
             'voice_emotion_per_second': voice_emotion_per_second,
             'focus_per_second': focus_per_second,
             'energy_per_second': energy_per_second,
+            'energy_prob_per_second': energy_prob_per_second,
             'voice_tone_per_second': voice_tone_per_second
         }
     @staticmethod   
-    def plot_speech(y, sr, silentTimeStamps,  speechTimeStamps, questionId, plotId):    
+    def plot_speech(y, sr, silentTimeStamps,  speechTimeStamps, path_to_file, questionId, plotId):    
         # Create a new figure and axis
         fig, axs = plt.subplots(nrows=3, sharex=True)
 
@@ -146,11 +149,11 @@ class ReportGenerator:
         fig.suptitle('Q{}: Speech and Silence Detection'.format(questionId))
         fig.legend()
 
-        plt.savefig('{}.png'.format('{}_video_{}'.format(questionId, plotId)))
+        plt.savefig('{}/{}.png'.format(path_to_file, '{}_video_{}'.format(questionId, plotId)))
         plt.close(plt.gcf())
 
     @staticmethod   
-    def plot_fillers(simpleFillerDictionary, complexFillerDictionary, questionId, plotId):
+    def plot_fillers(simpleFillerDictionary, complexFillerDictionary,path_to_file,  questionId, plotId):
         # Create a new figure and axis
         fig, ax = plt.subplots()
 
@@ -165,68 +168,53 @@ class ReportGenerator:
         ax.bar(keys, values, color=['blue', 'red', 'green', 'yellow', 'cyan', 'magenta', 'black', 'white'], label= keys, alpha=0.5)
         # make x axis size longer
         ax.set_xlim([-1, len(keys) + 5])
+        # make y axis has integers only
+        ax.yaxis.set_major_locator(MaxNLocator(integer=True))
         fig.suptitle('Q{}: Fillers'.format(questionId))
         fig.legend()
-        plt.savefig('{}.png'.format('{}_video_{}'.format(questionId, plotId)))
+        plt.savefig('{}/{}.png'.format(path_to_file, '{}_video_{}'.format(questionId, plotId)))
         plt.close(plt.gcf())
 
     @staticmethod   
-    def category_to_number(energy_per_second, focus_per_second, voice_tone_per_second):
+    def category_to_number(energy_prob_per_second, focus_per_second, voice_tone_per_second):
         # Initialize the result list
         energy_val_tmp = []
         focus_val_tmp = []
         tone_val_tmp = []
 
-        # Iterate through the ENERGY list
-        for i, value in enumerate(energy_per_second):
-            # Generate a random number of repetitions (between 3 and 6)
-            repetitions = random.randint(3, 6)
-            
-            # Generate a random number based on the value
-            if value == 'Not Energetic':
-                rand_num = random.uniform(*(0, 0.5))
-            elif value == 'Energetic':
-                rand_num = random.uniform(*(0.5, 1))
-            else:
-                rand_num = 0  # Set a default value if the value is not recognized
-            
-            # Copy the random number to the specified number of repetitions
-            energy_val_tmp.extend([rand_num] * repetitions)
+        energy_val_tmp = energy_prob_per_second
 
         # Iterate through the IRIS list
         for i, value in enumerate(focus_per_second):
-            # Generate a random number of repetitions (between 3 and 6)
-            repetitions = random.randint(3, 6)
-            
+                    
             # Generate a random number based on the value
             if value == 'Focused':
-                rand_num = random.uniform(*(0.5, 1))
+                val = energy_prob_per_second[i] * 0.5 + 0.5
             elif value == 'Not focused':
-                rand_num = random.uniform(*(0, 0.5))
+                val = energy_prob_per_second[i] * 0.5
             else:
-                rand_num = 0  # Set a default value if the value is not recognized
+                val = 0  # Set a default value if the value is not recognized
             
             # Copy the random number to the specified number of repetitions
-            focus_val_tmp.extend([rand_num] * repetitions)
+            focus_val_tmp.extend([val])
 
         # Iterate through the voice emotion list
         for i, value in enumerate(voice_tone_per_second):
-            # Generate a random number of repetitions (between 3 and 6)
-            repetitions = random.randint(3, 6)
             
             # Generate a random number based on the value
             if value == 'Monotone':
-                rand_num = random.uniform(*(0, 0.5))
+                val = energy_prob_per_second[i] * 0.5
             elif value == 'Non monotone':
-                rand_num = random.uniform(*(0.5, 1))
+                val = energy_prob_per_second[i] * 0.5 + 0.5
             else:
-                rand_num = 0  # Set a default value if the value is not recognized
+                val = 0  # Set a default value if the value is not recognized
             
             # Copy the random number to the specified number of repetitions
-            tone_val_tmp.extend([rand_num] * repetitions)
-        
+            tone_val_tmp.extend([val])
+
+
         # Truncate or pad the result list to match the length of the original list
-        energy_val_tmp = energy_val_tmp[:len(energy_per_second)]
+        energy_val_tmp = energy_val_tmp[:len(energy_prob_per_second)]
         focus_val_tmp = focus_val_tmp[:len(focus_per_second)]
         tone_val_tmp = tone_val_tmp[:len(voice_tone_per_second)]
         
@@ -236,7 +224,7 @@ class ReportGenerator:
             'tone_val': tone_val_tmp
         }
     @staticmethod   
-    def plot_plot(energy_val,focus_val, tone_val, questionId, plotId):
+    def plot_plot(energy_val,focus_val, tone_val,path_to_file,  questionId, plotId):
         fig, axs = plt.subplots(nrows=3, sharex=True)
         #create line plot for result
         axs[0].plot(energy_val, color = 'blue', alpha=0.5, label='Energy')
@@ -254,30 +242,28 @@ class ReportGenerator:
 
         axs[0].set( ylabel='Energy')
         axs[1].set(ylabel='Focus')
-        axs[2].set(xlabel='Time (s)', ylabel='Tone')
+        axs[2].set(xlabel='Time (s)', ylabel='Voice Tone')
         fig.legend()
         fig.suptitle('Q{}: Energy, Focus and Voice Tone'.format(questionId))
 
-        plt.savefig('{}.png'.format('{}_video_{}'.format(questionId, plotId)))
+        plt.savefig('{}/{}.png'.format(path_to_file, '{}_video_{}'.format(questionId, plotId)))
         plt.close(plt.gcf())
 
     @staticmethod   
-    def plot_iris(iris_pos_per_second, questionId, plotId):
+    def plot_iris(iris_pos_per_second,path_to_file,  questionId, plotId):
         # create pie chart for the irirs positions per second
         fig, axs = plt.subplots()
         c1  = Counter(iris_pos_per_second)
-        if len(c1.keys()) == 3:
-            axs.pie(c1.values(), labels=c1.keys(), explode=(0.1,0, 0), autopct='%1.1f%%')
-        else:
-            axs.pie(c1.values(), labels=c1.keys(), explode=(0.1,0,0, 0), autopct='%1.1f%%')
+        explode_values = (0.1, 0, 0, 0)[0:len(c1.keys())]
+        axs.pie(c1.values(), labels=c1.keys(), explode=explode_values, autopct='%1.1f%%')
         axs.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
         fig.suptitle('Q{}: Eye Tracking'.format(questionId))
         fig.legend()
-        plt.savefig('{}.png'.format('{}_video_{}'.format(questionId, plotId)))
+        plt.savefig('{}/{}.png'.format(path_to_file, '{}_video_{}'.format(questionId, plotId)))
         plt.close(plt.gcf())
 
     @staticmethod   
-    def plot_radar(facial_emotion_per_second, energy_per_second, focus_per_second, voice_tone_per_second,energy_val,focus_val,tone_val,  questionId, plotId):
+    def plot_radar(facial_emotion_per_second, energy_per_second, focus_per_second, voice_tone_per_second,energy_val,focus_val,tone_val, path_to_file, questionId, plotId):
         # create radar chart
         fig, ax = plt.subplots( subplot_kw={'projection': 'polar'})
 
@@ -285,25 +271,31 @@ class ReportGenerator:
         c2 = Counter(focus_per_second)
         c3 = Counter(energy_per_second)
         c4 = Counter(facial_emotion_per_second)
-        happy = c4['Happy'] / len(facial_emotion_per_second)
-        sad = c4['Sad'] / len(facial_emotion_per_second)
-        neutral = c4['Neutral'] / len(facial_emotion_per_second)
+        happy = c4['happy'] / len(facial_emotion_per_second)
+        sad = c4['sad'] / len(facial_emotion_per_second)
+        neutral = c4['neutral'] / len(facial_emotion_per_second)
 
         energy = sum(energy_val) / len(energy_val)
         tone = sum(tone_val) / len(tone_val)
         focus = sum(focus_val) / len(focus_val)
-        sad = sad * 0.9
 
+        # set r values * 100
+        r = [happy * 100, focus * 100, tone * 100, energy * 100, sad * 100, neutral * 100]
+        cat = ['Happy',  'Focus', 'Voice not monotonic','Energy' ,'Sad','Neutral']
+        N = len(cat)
+        x_as = [n / float(N) * 2 * np.pi for n in range(N)]
+        r += r[:1]
+        x_as += x_as[:1]
 
-        r = [happy,focus,tone ,energy,sad,neutral, happy]
+        
+        ax.plot(x_as, r)
+        ax.set_xticks(x_as[:-1], cat)
 
-        theta = np.linspace(0, 2*np.pi, len(r), endpoint=False)
+        # Set yticks
+        plt.yticks([20, 40, 60, 80, 100], ["20", "40", "60", "80", "100"])
 
-        ax.plot(theta, r)
-        ax.set_xticks(theta[:-1])
-        ax.set_xticklabels(['Happy',  'Focus', 'Voice not monotonic','Energy' ,'Sad','Neutral'])
         fig.suptitle('Q{}: Radar'.format(questionId))
-        plt.savefig('{}.png'.format('{}_video_{}'.format(questionId, plotId)))
+        plt.savefig('{}/{}.png'.format(path_to_file, '{}_video_{}'.format(questionId, plotId)))
         plt.close(plt.gcf())
     @staticmethod   
     def lpf(signal, alpha):

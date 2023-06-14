@@ -15,8 +15,6 @@ cors = CORS(app)
 
 from app import models
 from app import resources
-from app import serializers
-from app import errors
 from app.utils.video_queue_manager import VideoQueueManager
 from app.video_analyzer_models.video_analyzer import VideoAnalyzer
 video_queue_manager = VideoQueueManager(VideoAnalyzer)

@@ -1,26 +1,68 @@
 import React from 'react';
-import { useEffect } from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from "axios";
-// import videojs from 'video.js';
-// import 'video.js/dist/video-js.css';
-// import videoFiles from '../uploads/92d77e68-ad3f-4edf-aaed-750b53a0f0cf/92d77e68-ad3f-4edf-aaed-750b53a0f0cf_1_video.mp4';
-// import {DefaultPlayer as Video} from 'react-html5video';
-
+import { useCookies } from 'react-cookie';
 
 const Report = () => {
 
-    const [saveImage, setSaveImage] = useState('dddd');
-    const [isLoading, setIsLoading] = useState(true);
+    const [cookies] = useCookies(['interview_id']);
+    const [results, setResults] = useState([]);
 
-        useEffect(() => {
-            window.scrollTo(0, 0);
+    useEffect(() => {
+      window.scrollTo(0, 0);
+    }, []);
+    
+    function getVideoAnalysis(videoId) {
+      return new Promise((resolve, reject) => {
+        const retryDelay = 30000; // 30 seconds
+        const retry = () => {
+          axios
+            .get(`http://127.0.0.1:5000/report?interview_id=${cookies['interview_id']}&video_id=${videoId}`)
+            .then(response => {
+              increaseProgress();
+              resolve(response.data);
+            })
+            .catch(error => {
+              // Retry after the specified delay
+              setTimeout(retry, retryDelay);
+            });
+        };
+    
+        retry(); // Start the initial request
+      });
+    }
+    
+    useEffect(() => {
+      async function fetchData() {
+        const videoIds = ['_1_video', '_2_video', '_3_video', '_4_video', '_5_video'];
+        for (const videoId of videoIds) {
+          const data = await getVideoAnalysis(videoId);
+          setResults(prevResults => [...prevResults, data]);
+        }
+      }
+      fetchData();
+    }, []);
+    
 
-            const fill = document.querySelector('.progress-bar-fill');
-            const text = document.querySelector('.progress-text');
-            const wrapper = document.querySelector('.wrapper');
+    const [progress, setProgress] = useState(0);
+
+    useEffect(() => {
+              const fill = document.querySelector('.progress-bar-fill');
+              const text = document.querySelector('.progress-text');
+          
+              fill.style.width = progress + '%';
+              text.textContent = progress + '%';
+            }, [progress]);
+          
+    const increaseProgress = () => {
+              setProgress(prevProgress => prevProgress + 20);
+            };
+
+    const fill = document.querySelector('.progress-bar-fill');
+    const text = document.querySelector('.progress-text');
+    const wrapper = document.querySelector('.wrapper');
         
-            const options = {
+    const options = {
             responseType: 'blob',
             onDownloadProgress: function(progressEvent) {
                 const percentComplete = Math.floor((progressEvent.loaded / progressEvent.total) * 100);
@@ -29,7 +71,7 @@ const Report = () => {
             }
             };
         
-            axios.get('https://picsum.photos/400/400', options)
+    axios.get('https://picsum.photos/400/400', options)
             .then(res => {
                 // Do something with the result here
                 console.log("one",res);
@@ -47,10 +89,9 @@ const Report = () => {
                 
             })
             .catch(err => console.log(err));
-        }, []);
 
 
-        const [backendOutput, setBackendOutput] = useState([
+    const [backendOutput, setBackendOutput] = useState([
             {
                 "status": "success",
                 "highlighted_text": {
@@ -226,7 +267,6 @@ const Report = () => {
         </>
 
     )
-
 }
 
 

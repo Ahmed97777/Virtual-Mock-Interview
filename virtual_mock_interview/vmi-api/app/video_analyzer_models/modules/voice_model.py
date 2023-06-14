@@ -14,7 +14,7 @@ class VoiceModel:
     performs speech emotion analysis using a pre-trained machine learning model.
     '''
     
-    def __init__(self, model="tiny.en"):
+    def __init__(self, model="small.en"):
         '''
         Initializes the SpeechToText object.
         
@@ -32,7 +32,7 @@ class VoiceModel:
         pkl_model_path = app.config['VOICE_MODEL_PKL']
 
         self.emotion_model = pickle.load(open(pkl_model_path, 'rb'))
-        print("INFO: model loaded")
+        print("INFO: voice emotion model loaded!")
         
     
     def audio_prepocessing(self, audio_path, DEBUG=False):
@@ -199,28 +199,36 @@ class VoiceModel:
             features = np.hstack((features, tonnetz))
         return features
 
-    def voiceModel(self, video_id, DEBUG=False):
+    def voiceModel(self, video_path, DEBUG=False):
         
         #create parallel subprocess to execute whisper model
         #process = subprocess.Popen(["cd",  user_id, "&&","whisper", audio_file,"--model", self.model_type, "--language", "en", "&&", "cd", "../.."])
         # go to user directory and run whisper model
         try:
-            process = subprocess.call(["whisper","{}.wav".format(video_id), "--model", self.model_type, "--language", "en"])
+            # ["whisper","{}.wav".format(video_id), "--model", self.model_type, "--language", "en"]
+            
+            process = subprocess.call('whisper {}.wav --model {} --language en --output_dir {} '.format(video_path,
+                                                                                                                 self.model_type,
+                                                                                                                 '/'.join(video_path.split('/')[:-1])), # path/to/video --> path/to
+                                                                                                                 shell=True)
         except Exception as e:
             print("ERROR: failed to run whisper model")
             print(e)
             return
 
-        silentTimeStamps, speechTimeStamps, audioFiles = self.audio_prepocessing("{}.wav".format(video_id), DEBUG=DEBUG)
+        silentTimeStamps, speechTimeStamps, audioFiles = self.audio_prepocessing("{}.wav".format(video_path),
+                                                                                                        DEBUG=DEBUG)
         # emotion analysis
         voice_emotions, voice_tone = self.speech_emotion_analysis(audioFiles, DEBUG)
         
         # read text file
-        with open('{}.txt'.format(video_id), 'r') as f:
+        with open('{}.txt'.format(video_path), 'r') as f:
             text = f.read()
         # analyze text
         simpleFillerDictionary, complexFillerDictionary, mostCommonSimpleFiller =  self.analyze_text(text, DEBUG)
         highlightedText = text
+        # lower all text
+        highlightedText = highlightedText.lower()
         # highlight the filler words in the text
         for word in self.fillers:
             highlightedText = highlightedText.replace(word, '<span style="color: red; text-decoration: underline;">{}</span>'.format(word))
@@ -231,15 +239,17 @@ class VoiceModel:
 
 
         # Open the VTT file and read its contents
-        with open('{}.vtt'.format(video_id), 'r') as f:
+        with open('{}.vtt'.format(video_path), 'r') as f:
             vtt_contents = f.read()
+        # lower all text
+        vtt_contents = vtt_contents.lower()
         for word in self.fillers:
             vtt_contents = vtt_contents.replace(word, '<span style="color: red; text-decoration: underline;">{}</span>'.format(word))
         for cmplx in self.complex_fillers:
             vtt_contents = vtt_contents.replace(cmplx, '<span style="color: red; text-decoration: underline;">{}</span>'.format(cmplx))
         
         # Write the modified contents to the VTT file
-        with open('{}.vtt'.format(video_id), 'w') as f:
+        with open('{}.vtt'.format(video_path), 'w') as f:
             f.write(vtt_contents)
         # return all the analyzed information
         return {    "silentTimeStamps":silentTimeStamps,

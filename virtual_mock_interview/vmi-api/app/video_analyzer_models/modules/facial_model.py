@@ -5,6 +5,7 @@ import os
 import math
 from configparser import ConfigParser
 import json
+#import facial_emotion_detection as fed
 from . import facial_emotion_detection as fed
 import time
 from app import app
@@ -32,9 +33,9 @@ class FacialModel:
         config_path = app.config['FACIAL_CONFIG']
         model_path = app.config['FACIAL_MODEL_JSON']
         model_weights = app.config['FACIAL_MODEL_WEIGHTS']
-        # config_path = '../../app/video_analyzer_models/config.ini'
-        # model_path = '../../app/video_analyzer_models/models/facial_expression_model_structure.json'
-        # model_weights = '../../app/video_analyzer_models/models/facial_expression_model_weights.h5'
+        #config_path = 'app/video_analyzer_models/config.ini'
+        #model_path = 'app/video_analyzer_models/models/facial_expression_model_structure.json'
+        #model_weights = 'app/video_analyzer_models/models/facial_expression_model_weights.h5'
         self.config.read(config_path)
         self.emotion_model = fed.FacialEmotionAnalysis(model_path, model_weights)
         # eyes indexes in mediapipe
@@ -137,19 +138,33 @@ class FacialModel:
         iris_pos_per_frame = []
         facial_emotion_per_frame = []
 
+        
+        iris= ""
+        emotion = ""
+        emotion_prob = 0
+        energy = ""
+        energy_prob = 0
+
+        counter = 0
+
+
         cap = cv2.VideoCapture(0)
+        # get fps
+        fps = cap.get(cv2.CAP_PROP_FPS)
         while True:
             ret, frame = cap.read()
             if not ret:
-                print("failed to grab frame")
+                print("failed to grab frame or video ended")
                 break
             
             # get the iris position and facial emotion for the current frame
-            iris, emotion, energy, frame = self.facialAnalysis(frame, DEBUG)
+            
+            iris, emotion, emotion_prob, energy, energy_prob, frame = self.facialAnalysis(frame, emotion, emotion_prob, energy, energy_prob, counter, fps, True)
             iris_pos_per_frame.append(iris)
             facial_emotion_per_frame.append(emotion)
             # display the resulted frame
             cv2.imshow("frame", frame)
+            counter += 1
             key = cv2.waitKey(1)
             if key == ord('q'):
                 break
@@ -157,7 +172,7 @@ class FacialModel:
         cv2.destroyAllWindows()
         return iris_pos_per_frame, facial_emotion_per_frame
 
-    def facialAnalysis(self, frame, oldEmotion, oldEnergy, frameCounter, DEBUG= False):
+    def facialAnalysis(self, frame, oldEmotion, oldEmotionProb, oldEnergy, oldEnergyProb, frameCounter, fps, DEBUG= False):
         '''
         Detects and analyse person's facial landmarks in real-time using the computer's webcam.
 
@@ -171,12 +186,8 @@ class FacialModel:
         # get facial emotion analysis
         
             
-        frame, facial_emotion, energitic = self.facialEmotionAnalysis(frame, oldEmotion, oldEnergy, frameCounter, DEBUG)
+        frame, facial_emotion, facial_emotion_prob, energitic, energy_prob = self.facialEmotionAnalysis(frame, oldEmotion, oldEmotionProb, oldEnergy, oldEnergyProb, frameCounter, fps, DEBUG)
             
-        
-        # calculate fps
-        frame_count = 0
-        start_time = time.time()
 
         # get facial landmarks using mediapipe face mesh model
         with self.mp_face_mesh.FaceMesh(
@@ -234,10 +245,7 @@ class FacialModel:
                     iris_pos = "Not detected"
                     iris_ratio ="Not detected"
                     nose_to_eye_ratio = "Not detected"
-                        
-                frame_count += 1
-                #calculate fps
-                fps = frame_count / (time.time() - start_time)
+
                 # display fps on the frame
                 if DEBUG:
                     cv2.putText(
@@ -258,11 +266,10 @@ class FacialModel:
                             (255, 255, 255),
                             1
                     )
-                    
 
-        return iris_pos, facial_emotion, energitic, frame
+        return iris_pos, facial_emotion, facial_emotion_prob, energitic, energy_prob, frame
 
-    def facialEmotionAnalysis(self, frame, oldEmotion, oldEnergy, frameCounter, DEBUG = False):
+    def facialEmotionAnalysis(self, frame, oldEmotion, oldEmotionProb, oldEnergy, oldEnergyProb, frameCounter, fps, DEBUG = False):
         '''
         Analyzes the facial emotion of the given frame using the pre-trained EmotionModel and mediapipe FaceDetection model.
         Args:
@@ -283,7 +290,8 @@ class FacialModel:
             results = face_detection.process(frame)
             # if no faces were detected, return the original frame and None
             if(results.detections == None):
-                return orignal_frame, oldEmotion, oldEnergy
+                print("ERROR - facial_model.py: No faces detected")
+                return orignal_frame, oldEmotion, oldEmotionProb, oldEnergy, oldEnergyProb
             # get the bounding box of the detected face
             x = int(results.detections[0].location_data.relative_bounding_box.xmin * frame.shape[1])
             y = int(results.detections[0].location_data.relative_bounding_box.ymin *  frame.shape[0])
@@ -295,35 +303,44 @@ class FacialModel:
             try:
                 roi = cv2.resize(fc, (48, 48))
             except:
-                print("Error resizing the face")
-                return orignal_frame, oldEmotion, oldEnergy
+                print("ERROR - facial_model.py: resizing the face failed")
+                return orignal_frame, oldEmotion, oldEmotionProb, oldEnergy, oldEnergyProb
 
 
-            if frameCounter % 24 != 0:
-                print("DEBUG: frameCounter % 24 != 0 :  ", frameCounter)
-                cv2.putText(orignal_frame, oldEnergy, (x-2, y-10), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 0), 2)
+            if frameCounter % (fps) != 0:
+                cv2.putText(orignal_frame, '{}: {:0.2f}'.format(oldEnergy, oldEnergyProb), (x-2, y-10), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 0), 2)
                 cv2.rectangle(orignal_frame,(x,y),(x+w,y+h),(255, 255, 0), 2)
-                return orignal_frame, oldEmotion, oldEnergy
+                return orignal_frame, oldEmotion, oldEmotionProb, oldEnergy, oldEnergyProb
             
+            # predict the emotion of the face in the region of interest
+            try:
+                newEmotion, newEmotionProb = self.emotion_model.predict_emotion(roi[np.newaxis, :, :, np.newaxis])
             
-            # predict the emotion of the face
-            pred = self.emotion_model.predict_emotion(roi[np.newaxis, :, :, np.newaxis])
-            # if pred is either "Sad","Neutral" --> Not Energetic
-            # else if  "Happy", "Angry", "Disgust", "Fear", "Surprise" --> Energetic
-            # 
-            if pred in ["Sad"]:
+            except:
+                print("ERROR - facial_model.py: cannot predict emotion")
+                cv2.putText(orignal_frame, '{}: {:0.2f}'.format(oldEnergy, oldEnergyProb), (x-2, y-10), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 0), 2)
+                cv2.rectangle(orignal_frame,(x,y),(x+w,y+h),(255, 255, 0), 2)
+                return orignal_frame, oldEmotion, oldEmotionProb, oldEnergy, oldEnergyProb
+            # To calculate energy probablity:
+            # if the new emotion is sad, then the energy probablity is the probablity of sad
+            # if new emotion == neutral, then the energy probablity  = 0.5 prob of neutral
+            # else: high energy --> 0.5 prob of new emotion + 0.5 prob of the new emotion 
+            if newEmotion in ["sad"]:
                 isEnergitic = "Not Energetic"
+                energyProb = newEmotionProb * 0.3  # new energy probabality is in the range of 0.0 to 0.3 --> sad
             else:
-                isEnergitic = "Energetic"
+                isEnergitic = "Energetic" 
+                # energy prob will be 0.3 to 0.6 if the new emotion is neutral, and 0.6 to 1.0 if the new emotion is other than neutral and sad 
+                energyProb = ((newEmotionProb * 0.3) + 0.3) if newEmotion in ['neutral'] else ((newEmotionProb * 0.4)  +0.6)
 
-                cv2.putText(orignal_frame, isEnergitic, (x-2, y-10), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 0), 2)
-                cv2.rectangle(orignal_frame,(x,y),(x+w,y+h),(255, 255, 0), 2)
-        return orignal_frame, pred, isEnergitic
+            cv2.putText(orignal_frame, '{}: {:0.2f}'.format(isEnergitic, energyProb), (x-2, y-10), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 0), 2)
+            cv2.rectangle(orignal_frame,(x,y),(x+w,y+h),(255, 255, 0), 2)
+        return orignal_frame, newEmotion, newEmotionProb, isEnergitic, energyProb
 
-#-------------------for testing the model----------------------- #
-# if __name__ == "__main__":
-#     faceModel = FacialModel()
-#     faceModel.dummyMain(DEBUG = True)
+# -------------------for testing the model----------------------- #
+if __name__ == "__main__":
+    faceModel = FacialModel()
+    faceModel.dummyMain(DEBUG = True)
 
  
         
