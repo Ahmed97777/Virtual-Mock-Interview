@@ -13,6 +13,7 @@ class Video(Resource):
     def __init__(self):
         self.parser = reqparse.RequestParser()
         self.parser.add_argument('video', type=FileStorage, location='files')
+        self.parser.add_argument('question', type=str, location='form')
 
     
     def post(self):
@@ -27,6 +28,7 @@ class Video(Resource):
 
 
         video_file = request.files["video"]
+        question = request.form.get('question')
         if video_file and self.allowed_file(video_file.filename):
             video_filename = secure_filename(video_file.filename)
             interview_id = video_filename.split('_')[0]
@@ -48,7 +50,7 @@ class Video(Resource):
 
             # pass video to the queue to be processed.
             video_id = video_filename.split('.')[0]
-            app.config['video_queue_manager'].add_video(interview_id, video_id)
+            app.config['video_queue_manager'].add_video(interview_id, video_id, question)
 
             # Return video is being processed .
             return ' video {} added to queue'.format(video_id), 200

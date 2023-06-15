@@ -163,6 +163,8 @@ const Interview = () => {
         });
         const formData = new FormData();
         formData.append("video", blob, `${interviewId}_${counter - 1}_video.webm`);
+        // add question to the form data
+        formData.append("question", questions[counter - 2]);
         axios.post(`http://127.0.0.1:5000/video`, formData)
             .then(response => {
             console.log(response.data);

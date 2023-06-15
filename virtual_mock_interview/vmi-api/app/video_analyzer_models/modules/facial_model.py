@@ -31,13 +31,13 @@ class FacialModel:
         # read config sections
         self.config = ConfigParser()
         config_path = app.config['FACIAL_CONFIG']
-        model_path = app.config['FACIAL_MODEL_JSON']
-        model_weights = app.config['FACIAL_MODEL_WEIGHTS']
+        # model_path = app.config['FACIAL_MODEL_JSON']
+        # model_weights = app.config['FACIAL_MODEL_WEIGHTS']
         #config_path = 'app/video_analyzer_models/config.ini'
         #model_path = 'app/video_analyzer_models/models/facial_expression_model_structure.json'
         #model_weights = 'app/video_analyzer_models/models/facial_expression_model_weights.h5'
         self.config.read(config_path)
-        self.emotion_model = fed.FacialEmotionAnalysis(model_path, model_weights)
+        self.emotion_model = fed.FacialEmotionAnalysis()
         # eyes indexes in mediapipe
         self.LEFT_EYE = json.loads(self.config.get('FACE_INDEXES', 'LEFT_EYE'))
         self.RIGHT_EYE = json.loads(self.config.get('FACE_INDEXES', 'RIGHT_EYE'))
@@ -314,7 +314,7 @@ class FacialModel:
             
             # predict the emotion of the face in the region of interest
             try:
-                newEmotion, newEmotionProb = self.emotion_model.predict_emotion(roi[np.newaxis, :, :, np.newaxis])
+                newEmotion, newEmotionProb = self.emotion_model.predict_emotion(frame)
             
             except:
                 print("ERROR - facial_model.py: cannot predict emotion")

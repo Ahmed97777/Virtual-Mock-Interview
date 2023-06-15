@@ -34,6 +34,7 @@ class VoiceModel:
         self.emotion_model = pickle.load(open(pkl_model_path, 'rb'))
         print("INFO: voice emotion model loaded!")
         
+        
     
     def audio_prepocessing(self, audio_path, DEBUG=False):
         '''
@@ -247,7 +248,6 @@ class VoiceModel:
             vtt_contents = vtt_contents.replace(word, '<span style="color: red; text-decoration: underline;">{}</span>'.format(word))
         for cmplx in self.complex_fillers:
             vtt_contents = vtt_contents.replace(cmplx, '<span style="color: red; text-decoration: underline;">{}</span>'.format(cmplx))
-        
         # Write the modified contents to the VTT file
         with open('{}.vtt'.format(video_path), 'w') as f:
             f.write(vtt_contents)
