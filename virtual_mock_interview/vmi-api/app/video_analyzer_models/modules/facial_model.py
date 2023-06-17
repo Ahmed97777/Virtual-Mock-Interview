@@ -116,11 +116,11 @@ class FacialModel:
         if nose_to_eye_ratio <= 0.30:
             iris_position = "right"
         
-        elif nose_to_eye_ratio > 0.30 and nose_to_eye_ratio <= 0.70:
+        elif nose_to_eye_ratio > 0.30 and nose_to_eye_ratio <= 0.6:
             
-            if iris_ratio <= 0.40:
+            if iris_ratio <= 0.30:
                 iris_position = "right"
-            elif iris_ratio > 0.40 and iris_ratio <= 0.60:
+            elif iris_ratio > 0.30 and iris_ratio <= 0.6:
 
                 iris_position = "center"
             else:

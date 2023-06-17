@@ -988,35 +988,210 @@ input:checked + .slider:before {
 }
 
 .vis-img-cont {
-    max-width: 300px;
+    /* max-width: 300px;
     max-height: 300px;
     margin-right: 10px;
     margin-bottom: 10px;
-    background-color: #565656;
+    background-color: #565656; */
 }
 
 .visu-video {
-    width: 100%;
-    height: auto;
-    display: block;
-}
-
-.visu-hr {
-    border: none;
-    height: 2px;
-    background-color: #264996;
-    margin: 20px 0;
+    
 }
 
 .video-containerrrr {
+    /* width: 100%; */
+    /* max-width: 800px; */
+}
+
+/* styles in loading and data visu in Report.js */
+
+
+/* styling the reportssss data */
+.visu-container_Holder {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 20px;
     width: 100%;
-    max-width: 800px;
+    margin-bottom: 20px;
+}
+
+.fig-Holder {
+    background-color: #f9f9f9;
+    border-radius: 8px;
 }
 
 .vis-img {
-    max-width: 300px;
-    max-height: 300px;
-    margin-right: 10px;
+    width: 100%;
     margin-bottom: 10px;
+    margin-top: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 1.1);
 }
-/* styles in loading and data visu in Report.js */
+
+.the-Q {
+    text-align: center;
+    font-size: 25px;
+    font-weight: bold;
+    color: #333;
+}
+
+.feedback-Holder {
+    padding: 20px;
+    margin-bottom: 20px;
+    font-size: 18px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: justify;
+    color: #555;
+    overflow: hidden;
+}
+
+.visu-container_Holder p {
+    margin: 0;
+    margin-left: 15px;
+    padding: 20px;
+    text-align: justify;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    color: #555;
+    width: 100%;
+    height: auto;
+    max-height: 377px;
+}
+
+.visu-container_Holder p span {
+    color: red;
+    text-decoration: underline;
+}
+
+.hamadassa span{
+    color: red;
+    text-decoration: underline;
+    font-weight: bold;
+}
+
+.visu-container_Holder video {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.visu-hr {
+    margin: 20px 0;
+    border: none;
+    border-top: 1px solid #ccc;
+    color: #ccc;
+    height: 6px;
+    background-color: #264996;
+}
+
+/* Responsive adjustments */
+
+@media (max-width: 1450px) {
+    .visu-container_Holder p {
+        overflow-y: scroll;
+        max-height: 352px;
+    }
+    .fig-Holder {
+        margin-left: 56px;
+        width: 90%;
+    }
+}
+
+@media (max-width: 1430px) {
+    .visu-container_Holder p {
+        overflow-y: scroll;
+        max-height: 309px;
+    }
+}
+
+@media (max-width: 1280px) {
+    .fig-Holder {
+        margin-left: 260px;
+        width: 50%;
+    }
+    .visu-container_Holder p {
+        overflow-y: scroll;
+        max-height: 253px;
+    }
+}
+
+@media (max-width: 1280px) {
+    .fig-Holder {
+        margin-left: 172px;
+        width: 60%;
+    }
+}
+
+@media (max-width: 880px) {
+    .fig-Holder {
+        margin-left: 128px;
+    }
+}
+
+@media (max-width: 770px) {
+    .fig-Holder {
+        margin-left: 78px;
+    }
+}
+
+@media (max-width: 690px) {
+    .fig-Holder {
+        margin-left: 38px;
+    }
+}
+
+@media (max-width: 640px) {
+    .fig-Holder {
+        margin-left: 7px;
+    }
+}
+
+@media (max-width: 620px) {
+    .visu-container_Holder p {
+        width: 93%;
+    }
+
+    .vis-img {
+        margin-left: 35px;
+    }
+
+    .visu-container_Holder {
+        grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+    }
+}
+
+@media (max-width: 560px) {
+    .visu-container_Holder video {
+        width: 95%;
+    }
+
+    .visu-container_Holder p {
+        width: 85%;
+    }
+
+    .feedback-Holder {
+        width: 96%;
+        font-size: 16px;
+    }
+
+    .visu-container_Holder {
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    }
+}
+
+@media (max-width: 520px) {
+    .vis-img {
+        margin-left: 0px;
+    }
+    .feedback-Holder {
+        font-size: 16px;
+}
+}
+
+/* styling the reportssss data */

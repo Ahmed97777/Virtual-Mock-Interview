@@ -9,47 +9,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 const Interview = () => {
 
-    const [specificVariable, setSpecificVariable] = useState(false);
-
-    // const toggleVideoButton = () => {
-    //     setSpecificVariable(true);
-    //     console.log("this is the toggle on");
-    //     console.log(specificVariable);
-    // }
-
-    // const toggleVideoButtonOff = () => {
-    //     setSpecificVariable(false);
-    //     console.log("this is the toggle off");
-    //     console.log(specificVariable);
-    // }
-
-    const [isOn, setIsOn] = useState(false);
-
-    const handleToggle = () => {
-        setIsOn((prevState) => !prevState);
-    
-        // Call the appropriate function based on the toggle state
-        if (!isOn) {
-        // Function to execute when the toggle is turned on
-        specificFunctionOn();
-        } else {
-        // Function to execute when the toggle is turned off
-        specificFunctionOff();
-        }
-    };
-    
-    const specificFunctionOn = () => {
-        setSpecificVariable(true);
-        console.log("this is the toggle on");
-        console.log(specificVariable);
-    };
-    
-    const specificFunctionOff = () => {
-        setSpecificVariable(false);
-        console.log("this is the toggle off");
-        console.log(specificVariable);
-    };
-
+    const [cameraViewToggle, setCameraViewToggle] = useState(false);
 
     const [interviewId, setInterviewId] = useState('');
 
@@ -161,11 +121,15 @@ const Interview = () => {
         const blob = new Blob(recordedChunks, {
             type: "video/webm"
         });
+        const videoFilename = `${interviewId}_${counter - 1}_video.webm`;
         const formData = new FormData();
-        formData.append("video", blob, `${interviewId}_${counter - 1}_video.webm`);
-        // add question to the form data
+
+        formData.append("file", blob, videoFilename);
+        formData.append("interview_id", interviewId);
         formData.append("question", questions[counter - 2]);
-        axios.post(`http://127.0.0.1:5000/video`, formData)
+        formData.append("video_filename", videoFilename);
+
+        axios.post(`http://127.0.0.1:8000/file/${interviewId}`, formData)
             .then(response => {
             console.log(response.data);
             })
@@ -173,6 +137,18 @@ const Interview = () => {
             // Handle the error
             });
         setRecordedChunks([]);
+        
+        // const videoFormData = new FormData();
+        // videoFormData.append("interview_id", interviewId);
+        // videoFormData.append("question", questions[currentQuestionIndex]);
+        // videoFormData.append("video_filename", videoFilename);
+        // axios.post(`http://127.0.0.1:5000/video`,videoFormData)
+        //     .then(response => {
+        //         console.log(response.data);
+        //         })
+        //         .catch(error => {
+        //         // Handle the error
+        //         });
         }
     }, [recordedChunks]);
 
@@ -321,6 +297,8 @@ const Interview = () => {
                 setDisplayRunningLate(false);
                 setCounter(counter + 1);
                 setDisplayTimer(false);
+
+                setCameraViewToggle(false);
                 console.log(counter);
                 
             }
@@ -346,7 +324,22 @@ const Interview = () => {
         window.scrollTo(0, 0);
         }, []);
 
-        
+    function getQuestion(){
+        if(currentQuestionIndex < 5){
+        return `Q${currentQuestionIndex + 1}: ${currentQuestion}`
+        }
+        else{
+            return 'Congratulations! You have completed the interview.'
+        }
+    }
+    function disableButton(){
+        if(currentQuestionIndex < 5){
+            return false;
+        }
+        else{
+            return true;
+        }
+    }    
             
 
 
@@ -368,17 +361,18 @@ const Interview = () => {
                                 <i className="fas fa-video"></i>
                                 <i className="fas fa-microphone"></i>
                             </div>
-                            <div>
+                            <div style={{ display: disableButton() ? 'none' : 'block' }}>
                                 {/* <button onClick={toggleVideoButton} >show cam</button> */}
                                 {/* <button onClick={toggleVideoButtonOff} >No cam</button> */}
-                                <label className="switch">
+                                <label className="switch" >
                                     <input
                                         type="checkbox"
-                                        onChange={handleToggle}
+                                        
+                                        onChange={() =>{setCameraViewToggle(!cameraViewToggle);}}
                                     />
                                     <span className="slider round" />
                                 </label>
-                                <span className="toggle-text">{isOn ? 'Video On' : 'Video Off'}</span>
+                                <span className="toggle-text">{cameraViewToggle ? 'Video On' : 'Video Off'}</span>
                                 <div className={`timer ${displayTimer ? 'timer-update' : ''}`} >{formatTime(timeRemaining)}</div>
                             </div>
                             
@@ -386,11 +380,11 @@ const Interview = () => {
                         <div className= "running-container" >
                             <p className={`time-running ${displayRunningLate ? 'time-running-update' : ''}`} >Time Low</p>
                         </div>
-                        <div className="question" id={`${specificVariable ? 'questionId' : 'questionId-without-video'}`} style={{ display: showFirstQuestion ? 'block' : 'none' }}>
-                            {currentQuestion}
+                        <div className="question" id={`${cameraViewToggle ? 'questionId' : 'questionId-without-video'}`} style={{ display: showFirstQuestion ? 'block' : 'none' }}>
+                            {getQuestion()}
                         </div>
 
-                        <Webcam className='interview-vid' audio={true} ref={webcamRef} muted={true} style={{ display: specificVariable ? 'block' : 'none' }} />
+                        <Webcam className='interview-vid' audio={true} ref={webcamRef} muted={true} style={{ display: cameraViewToggle ? 'block' : 'none' }} />
                         
 
                     </div>
