@@ -11,18 +11,18 @@ class VideoQueueManager:
         self.worker_thread = threading.Thread(target=self.process_video_queue)
         self.worker_thread.start()
 
-    def add_video(self, interview_id, video_filename):
-        self.video_queue.put((interview_id, video_filename))
+    def add_video(self, interview_id, video_filename, question):
+        self.video_queue.put((interview_id, video_filename, question))
     
     def process_video_queue(self):
         while True:
             try:
                 # Get video information from the queue
-                interview_id, video_id = self.video_queue.get()
+                interview_id, video_id, question = self.video_queue.get()
                 # Acquire the lock to ensure exclusive access to the processing function
                 self.processing_lock.acquire()
                 # Analyze the video.
-                self.video_analyzer.analyze_video(interview_id, video_id)
+                self.video_analyzer.analyze_video(interview_id, video_id, question)
                 
                 # Release the lock to allow other videos to be processed
                 self.processing_lock.release()

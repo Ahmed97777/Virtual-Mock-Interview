@@ -23,7 +23,7 @@ class VoiceModel:
         '''
 
         # list of fillers to be checked in the model
-        self.fillers = ['well', 'like', 'actually', 'basically', 'seriously', 'literally', 'totally','right', 'umm', 'um', 'uh', 'hmm', 'okay', 'ok','actually', 'honestly', 'yeah', 'yep', 'right' ]
+        self.fillers = ['well', 'like', 'actually', 'basically', 'seriously', 'literally', 'totally','right', 'umm', 'um', 'uh', 'hmm', 'okay', 'ok', 'honestly', 'yeah', 'yep' ]
         self.complex_fillers = ['i guess','i suppose','believe me','you know what i mean','i mean','you see','you know','at the end of the day']
         
         self.samplerate_soundFile = 0
@@ -33,6 +33,7 @@ class VoiceModel:
 
         self.emotion_model = pickle.load(open(pkl_model_path, 'rb'))
         print("INFO: voice emotion model loaded!")
+        
         
     
     def audio_prepocessing(self, audio_path, DEBUG=False):
@@ -231,23 +232,38 @@ class VoiceModel:
         highlightedText = highlightedText.lower()
         # highlight the filler words in the text
         for word in self.fillers:
-            highlightedText = highlightedText.replace(word, '<span style="color: red; text-decoration: underline;">{}</span>'.format(word))
+            pattern = r"\b{}\b".format(word)
+            matches = re.findall(pattern, highlightedText)
+            if matches:
+                for match in matches:
+                    highlightedText = re.sub(pattern, '<span>{}</span>'.format(match), highlightedText)
         for cmplx in self.complex_fillers:
-            highlightedText = highlightedText.replace(cmplx, '<span style="color: red; text-decoration: underline;">{}</span>'.format(cmplx))
+            pattern = r"\b{}\b".format(word)
+            matches = re.findall(pattern, highlightedText)
+            if matches:
+                for match in matches:
+                    highlightedText = re.sub(pattern, '<span>{}</span>'.format(match), highlightedText)
         
 
 
-
+        # <span style="color: green; text-decoration: underline;">{}</span>
         # Open the VTT file and read its contents
         with open('{}.vtt'.format(video_path), 'r') as f:
             vtt_contents = f.read()
         # lower all text
         vtt_contents = vtt_contents.lower()
         for word in self.fillers:
-            vtt_contents = vtt_contents.replace(word, '<span style="color: red; text-decoration: underline;">{}</span>'.format(word))
+            pattern = r"\b{}\b".format(word)
+            matches = re.findall(pattern, vtt_contents)
+            if matches:
+                for match in matches:
+                    vtt_contents = re.sub(pattern, '<span style="color: green; text-decoration: underline;">{}</span>'.format(match), vtt_contents)
         for cmplx in self.complex_fillers:
-            vtt_contents = vtt_contents.replace(cmplx, '<span style="color: red; text-decoration: underline;">{}</span>'.format(cmplx))
-        
+            pattern = r"\b{}\b".format(word)
+            matches = re.findall(pattern, vtt_contents)
+            if matches:
+                for match in matches:
+                    vtt_contents = re.sub(pattern, '<span style="color: green; text-decoration: underline;">{}</span>'.format(match), vtt_contents)
         # Write the modified contents to the VTT file
         with open('{}.vtt'.format(video_path), 'w') as f:
             f.write(vtt_contents)

@@ -1,5 +1,6 @@
 import cv2
 import os
+import openai
 import subprocess
 import multiprocessing as mp
 from app.video_analyzer_models.modules.facial_model import FacialModel
@@ -9,37 +10,62 @@ import pickle
 
 class VideoAnalyzer:
     @staticmethod
-    def analyze_video(interview_id,video_id, DEBUG=False):
-
+    def analyze_video(interview_id,video_id, question, DEBUG=False):\
+        
+        # init openai
+        print("DEBUG: quesitons: {}".format(question))
+        openai.api_key = app.config['OPENAI_API_KEY']
         voiceModel = VoiceModel()
         result_dict = {}
-        path_to_video_id = '{}/{}/{}'.format(app.config["UPLOAD_FOLDER"], interview_id, video_id)            
+        original_video_path = '{}/{}/{}'.format(app.config["UPLOAD_FOLDER"], interview_id, video_id)
+        output_video_path = '{}/{}/{}'.format(app.config["DOWNLOAD_FOLDER"], interview_id, video_id)
+        
         # using ffmpeg to get audio from the webm video in a parrallel subprocess
         # ffmpeg -i "video_id.webm" -q:a 0 -map a "video_id.wav"
         # ['ffmpeg', '-i', video_id + '.webm', '-q:a', '0', '-map', 'a', video_id + '.wav']
-        process1 = subprocess.call('ffmpeg -i {}.webm -q:a 0 -map a {}.wav'.format(path_to_video_id,path_to_video_id),shell=True)
+        process1 = subprocess.call('ffmpeg -fflags +genpts -i {}.webm -r 30 {}-input.mp4'.format(original_video_path,output_video_path),shell=True)
+        process2 = subprocess.call('ffmpeg -i {}-input.mp4 -q:a 0 -map a {}.wav'.format(output_video_path,output_video_path),shell=True)
         
-        result_dict.update(voiceModel.voiceModel(path_to_video_id , DEBUG))
+        result_dict.update(voiceModel.voiceModel(output_video_path , DEBUG))
         del voiceModel
-        queue = mp.Queue()
-        p1 = mp.Process(target=VideoAnalyzer.analyze_vid_process, args=(queue ,path_to_video_id, DEBUG))
+        # convert the webm video to mp4
+        # ffmpeg  -i "video_1.webm" -c:v libx264 -crf 22 -c:a copy "video_1.mp4"
+       
+
+        ctx = mp.get_context('spawn')
+        queue = ctx.Queue()
+        p1 = ctx.Process(target=VideoAnalyzer.analyze_vid_process, args=(queue ,output_video_path, DEBUG))
         p1.start()
         result_dict.update(queue.get())
-        p1.join()
-        
+        p1.terminate()
+        try:
+            #create gpt response
+            gpt_response = openai.ChatCompletion.create(
+                model = "gpt-3.5-turbo",
+                messages = [
+                    {"role": "system", "content": "You are a helpful interviewer that provides feedback on the interviewee's answer directly to the interviewee. Mention the interviewee's sentences structure , also mention whether the words they used are professional or not, also comment on the energy of the interviewee during answering the question, lastly, provide examples whenever possible whenever there is a window for improvment in the interviewee's speech, sentences structure and words. You must not ask questions."},
+                    {"role": "user", "content":'I got asked question: `{}`, and I answered `{}`, mostly my energy was {} during the question.'.format(question, result_dict['text'], result_dict['most_energy'])},
+                ]
+            )
+            print(gpt_response['choices'][0]['message']['content'])
+            result_dict['gpt_response'] = gpt_response['choices'][0]['message']['content']
+        except:
+            result_dict['gpt_response'] = "Sorry, OpenAI is not working right now, please try again later."
         # ffmpeg -i video_id.avi -i video_id.wav -c:v copy -c:a  aac  -map 0:v:0 -map 1:a:0 video_id.avi and say yes to overwrite the existing file
         # ['ffmpeg', '-i', video_id + '.avi', '-i', video_id + '.wav', '-c:v', 'copy', '-c:a', 'aac', '-map', '0:v:0', '-map', '1:a:0', video_id + '-temp.avi']
-        process2 = subprocess.call('ffmpeg -i {}.avi -i {}.wav -c:v copy -c:a aac -map 0:v:0 -map 1:a:0 {}-temp.avi'.format(path_to_video_id, path_to_video_id, path_to_video_id),shell=True)
+        process3 = subprocess.call('ffmpeg -i {}-temp.mp4 -i {}.wav -c:v libx264 -c:a aac -strict -2 -map 0:v:0 -map 1:a:0 {}-temp-audio.mp4'.format(output_video_path, output_video_path, output_video_path),shell=True)
         # delete .avi original file and rename the -temp file to .avi
-        os.remove('{}.avi'.format(path_to_video_id))
-        os.rename('{}-temp.avi'.format(path_to_video_id), '{}.avi'.format(path_to_video_id))
+        #os.remove('{}-temp.mp4'.format(path_to_video_id))
+        os.rename('{}-temp-audio.mp4'.format(output_video_path), '{}.mp4'.format(output_video_path))
         # change the avi file to mp4
         # ffmpeg -i input_filename.avi -c:v copy -c:a copy -y output_filename.mp4
         # ['ffmpeg', '-i', video_id + '.avi', '-c:v', 'copy', '-c:a', 'copy', '-y', video_id + '.mp4']
-        process3 = subprocess.call('ffmpeg -i {}.avi -c:v copy -c:a copy -y {}.mp4'.format(path_to_video_id, path_to_video_id), shell=True)
+        # process3 = subprocess.call('ffmpeg -i {}.avi -c:v copy -c:a copy -y {}.mp4'.format(path_to_video_id, path_to_video_id), shell=True)
         
+
+
         # create a pickle file to store the result dictionary
-        with open('{}.pkl'.format(path_to_video_id), 'wb+') as f:
+        with open('{}.pkl'.format(output_video_path), 'wb+') as f:
             pickle.dump(result_dict, f, pickle.HIGHEST_PROTOCOL)
 
         return
@@ -63,17 +89,19 @@ class VideoAnalyzer:
         energy_prob = 0
         frameCounter = 0
 
-        fourcc = cv2.VideoWriter_fourcc(*'XVID')
-        cap = cv2.VideoCapture('{}.webm'.format(video_path))
+        
+        cap = cv2.VideoCapture('{}-input.mp4'.format(video_path))
         
         fps = cap.get(cv2.CAP_PROP_FPS)
+        print("DEBUG: fps: {}".format(fps))
         #creating video writer to write the output video: the output video extension is avi so that ffmepeg can merge it later with the audio with no need for additional configurations
-        output_video = cv2.VideoWriter('{}.avi'.format(video_path), fourcc, fps , frameSize = (int(cap.get(3)), int(cap.get(4))))
+        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+        output_video = cv2.VideoWriter('{}-temp.mp4'.format(video_path), fourcc, fps , frameSize = (int(cap.get(3)), int(cap.get(4))))
 
         while cap.isOpened():
             ret, frame = cap.read()
             if not ret:
-                   
+
                 print("video ended or failed to grab frame")
                 break
             
@@ -91,14 +119,18 @@ class VideoAnalyzer:
                  break
         cap.release()
         cv2.destroyAllWindows()
-        os.remove('{}.webm'.format(video_path))
+        #os.remove('{}.webm'.format(video_path))
+        # calculate what is the most frequent energy in the video: Energetic or Not Energetic
+        energy = max(set(energy_per_frame), key=energy_per_frame.count)
+
         del facialModel
         result_dict = {
             'iris_pos_per_frame': iris_pos_per_frame,
             'facial_emotion_per_frame': facial_emotion_per_frame,
             'facial_emotion_prob_per_frame': facial_emotion_prob_per_frame,
             'energy_per_frame': energy_per_frame,
-            'energy_prob_per_frame': energy_prob_per_frame
+            'energy_prob_per_frame': energy_prob_per_frame,
+            'most_energy': energy
         }
         queue.put(result_dict)
         return 

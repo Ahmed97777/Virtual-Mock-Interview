@@ -19,7 +19,8 @@ class ReportGenerator:
         # wait for video to be processed
         text = {}
         highlighted_text = {}
-        path_to_file = app.config['UPLOAD_FOLDER'] + '/' + interviewId + '/'
+        gpt_response = {}
+        path_to_file = app.config['DOWNLOAD_FOLDER'] + '/' + interviewId + '/'
         if not os.path.isfile(path_to_file + interviewId + videoId + '.pkl'):
             return {'msg': 'Video ID not found.'}
         else:
@@ -34,6 +35,7 @@ class ReportGenerator:
             
             text.update({i:df['text']})
             highlighted_text.update({i:df['highlightedText']})
+            gpt_response.update({i:df['gpt_response']})
             
             # plot the speech and silence of the question
             ReportGenerator.plot_speech(y, sr, df['silentTimeStamps'], df['speechTimeStamps'], path_to_file,i,0)
@@ -43,7 +45,7 @@ class ReportGenerator:
             # add energy_val, focus_val, voice_tone_val to lite_df
             lite_df.update(ReportGenerator.category_to_number(lite_df['energy_prob_per_second'],lite_df['focus_per_second'], lite_df['voice_tone_per_second']))
             # plot the energy, focus, voice_tone of the question
-            ReportGenerator.plot_plot(ReportGenerator.lpf(lite_df['energy_val'], 0.8), ReportGenerator.lpf(lite_df['focus_val'],0.8), ReportGenerator.lpf(lite_df['tone_val'],0.8),path_to_file, i, 2)
+            ReportGenerator.plot_plot(ReportGenerator.lpf(lite_df['energy_val'], 0.3), ReportGenerator.lpf(lite_df['focus_val'],0.3), ReportGenerator.lpf(lite_df['tone_val'],0.3),path_to_file, i, 2)
             # plot the iris tracking of the question
             ReportGenerator.plot_iris(lite_df['iris_pos_per_second'],path_to_file, i, 3)
             # plot the radar of the question
@@ -61,7 +63,8 @@ class ReportGenerator:
             print('DEBUG: done with ' + videoId)
         return {'msg': 'success',
                 'text': text,
-                'highlighted_text': highlighted_text
+                'highlighted_text': highlighted_text,
+                'gpt_response': gpt_response
                 }
             
 
@@ -165,10 +168,12 @@ class ReportGenerator:
         values = list(simple_dict.values()) + list(complex_dict.values())
 
         # Plot the bar chart
-        ax.bar(keys, values, color=['blue', 'red', 'green', 'yellow', 'cyan', 'magenta', 'black', 'white'], label= keys, alpha=0.5)
+        ax.bar(keys, values, color=['blue', 'red', 'green', 'yellow', 'cyan', 'magenta', 'black', 'orange'], label= keys, alpha=0.5)
         # make x axis size longer
         ax.set_xlim([-1, len(keys) + 5])
-        # make y axis has integers only
+        # make x axis words with 30 degree angle
+        plt.xticks(rotation=30)
+        #  make y axis has integers only
         ax.yaxis.set_major_locator(MaxNLocator(integer=True))
         fig.suptitle('Q{}: Fillers'.format(questionId))
         fig.legend()
