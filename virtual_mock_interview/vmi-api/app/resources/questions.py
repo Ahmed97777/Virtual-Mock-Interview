@@ -11,9 +11,11 @@ class Questions(Resource):
         # Get the job field from the request.
         # print request.args
         job_field = self.parser.parse_args().get('job_field')
+        
         introduction_questions = Question.get_questions_by_field('Introductory', 1)
         non_tech_questions = Question.get_questions_by_field('non-technical', 1)
         tech_questions = Question.get_questions_by_field(job_field, 3)
+        
         questions = introduction_questions + non_tech_questions + tech_questions
         # Return the list of questions in json format.
         return jsonify([question.serialize() for question in questions])

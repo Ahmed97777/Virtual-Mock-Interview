@@ -608,6 +608,11 @@ background-color: var(--background-color);
 #questionId {
     position: absolute;
     bottom: 12%;
+    /* center the question*/
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    
     padding-left: 20px;
     padding-right: 20px;
 }
@@ -1091,7 +1096,6 @@ input:checked + .slider:before {
 }
 
 /* Responsive adjustments */
-
 @media (max-width: 1450px) {
     .visu-container_Holder p {
         overflow-y: scroll;
@@ -1128,6 +1132,18 @@ input:checked + .slider:before {
     }
 }
 
+@media (max-width: 960px) {
+    .wrapper {
+        width: 465px;
+    }
+    .progress-bar {
+        margin-left: 58px;
+    }
+    .progress-text {
+        margin-left: 58px;
+    }
+}
+
 @media (max-width: 880px) {
     .fig-Holder {
         margin-left: 128px;
@@ -1138,6 +1154,16 @@ input:checked + .slider:before {
     .fig-Holder {
         margin-left: 78px;
     }
+    .wrapper {
+        width: 400px;
+    }
+    .progress-bar {
+        margin-left: 60px;
+    }
+    .progress-text {
+        margin-left: 60px;
+    }
+
 }
 
 @media (max-width: 690px) {
@@ -1161,8 +1187,24 @@ input:checked + .slider:before {
         margin-left: 35px;
     }
 
+    .wrapper {
+        width: 300px;
+    }
+
     .visu-container_Holder {
         grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+    }
+}
+
+@media (max-width: 560px) {
+    .wrapper {
+        width: 300px;
+    }
+    .progress-bar {
+        margin-left: 60px;
+    }
+    .progress-text {
+        margin-left: 60px;
     }
 }
 
@@ -1191,7 +1233,22 @@ input:checked + .slider:before {
     }
     .feedback-Holder {
         font-size: 16px;
-}
+    }
+    .wrapper {
+        width: 240px;
+    }
+    .progress-bar {
+        margin-left: 55px;
+    }
+    .progress-text {
+        margin-left: 55px;
+    }
+
 }
 
+@media (max-width: 450px) {
+    .wrapper {
+        width: 160px;
+    }
+}
 /* styling the reportssss data */

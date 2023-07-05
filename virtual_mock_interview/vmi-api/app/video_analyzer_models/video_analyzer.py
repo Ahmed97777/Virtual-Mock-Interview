@@ -10,36 +10,34 @@ import pickle
 
 class VideoAnalyzer:
     @staticmethod
-    def analyze_video(interview_id,video_id, question, DEBUG=False):\
+    def analyze_video(interview_id,video_id, question, DEBUG=False):
         
-        # init openai
-        print("DEBUG: quesitons: {}".format(question))
         openai.api_key = app.config['OPENAI_API_KEY']
         voiceModel = VoiceModel()
         result_dict = {}
         original_video_path = '{}/{}/{}'.format(app.config["UPLOAD_FOLDER"], interview_id, video_id)
         output_video_path = '{}/{}/{}'.format(app.config["DOWNLOAD_FOLDER"], interview_id, video_id)
         
-        # using ffmpeg to get audio from the webm video in a parrallel subprocess
-        # ffmpeg -i "video_id.webm" -q:a 0 -map a "video_id.wav"
-        # ['ffmpeg', '-i', video_id + '.webm', '-q:a', '0', '-map', 'a', video_id + '.wav']
+        # using ffmpeg to convert the video to mp4 and seperate the audio from the video
         process1 = subprocess.call('ffmpeg -fflags +genpts -i {}.webm -r 30 {}-input.mp4'.format(original_video_path,output_video_path),shell=True)
         process2 = subprocess.call('ffmpeg -i {}-input.mp4 -q:a 0 -map a {}.wav'.format(output_video_path,output_video_path),shell=True)
         
+        # using the voice model to analyze the audio
         result_dict.update(voiceModel.voiceModel(output_video_path , DEBUG))
+        # delete the voice model object to free up memory
         del voiceModel
-        # convert the webm video to mp4
-        # ffmpeg  -i "video_1.webm" -c:v libx264 -crf 22 -c:a copy "video_1.mp4"
        
-
+        # create a process to run the facial model
         ctx = mp.get_context('spawn')
         queue = ctx.Queue()
         p1 = ctx.Process(target=VideoAnalyzer.analyze_vid_process, args=(queue ,output_video_path, DEBUG))
         p1.start()
+        # get the result from the facial model process
         result_dict.update(queue.get())
+        # terminate the facial model process and free up memory
         p1.terminate()
+        # get the gpt response from openai and add it to the result_dict
         try:
-            #create gpt response
             gpt_response = openai.ChatCompletion.create(
                 model = "gpt-3.5-turbo",
                 messages = [
@@ -51,28 +49,19 @@ class VideoAnalyzer:
             result_dict['gpt_response'] = gpt_response['choices'][0]['message']['content']
         except:
             result_dict['gpt_response'] = "Sorry, OpenAI is not working right now, please try again later."
-        # ffmpeg -i video_id.avi -i video_id.wav -c:v copy -c:a  aac  -map 0:v:0 -map 1:a:0 video_id.avi and say yes to overwrite the existing file
-        # ['ffmpeg', '-i', video_id + '.avi', '-i', video_id + '.wav', '-c:v', 'copy', '-c:a', 'aac', '-map', '0:v:0', '-map', '1:a:0', video_id + '-temp.avi']
+        # merge the audio and video together
         process3 = subprocess.call('ffmpeg -i {}-temp.mp4 -i {}.wav -c:v libx264 -c:a aac -strict -2 -map 0:v:0 -map 1:a:0 {}-temp-audio.mp4'.format(output_video_path, output_video_path, output_video_path),shell=True)
-        # delete .avi original file and rename the -temp file to .avi
+        # delete the temp files
         #os.remove('{}-temp.mp4'.format(path_to_video_id))
         os.rename('{}-temp-audio.mp4'.format(output_video_path), '{}.mp4'.format(output_video_path))
-        # change the avi file to mp4
-        # ffmpeg -i input_filename.avi -c:v copy -c:a copy -y output_filename.mp4
-        # ['ffmpeg', '-i', video_id + '.avi', '-c:v', 'copy', '-c:a', 'copy', '-y', video_id + '.mp4']
-        # process3 = subprocess.call('ffmpeg -i {}.avi -c:v copy -c:a copy -y {}.mp4'.format(path_to_video_id, path_to_video_id), shell=True)
-        
-
 
         # create a pickle file to store the result dictionary
         with open('{}.pkl'.format(output_video_path), 'wb+') as f:
             pickle.dump(result_dict, f, pickle.HIGHEST_PROTOCOL)
-
         return
 
     @staticmethod
     def analyze_vid_process(queue,video_path, DEBUG):
-    # def analyze_vid_process(queue ,interview_id, video_id, DEBUG):
         # load facial model here instead of init to utilize gpu usage
         facialModel = FacialModel()
         # using opencv library to process the video and send the frames to the facial model
@@ -89,12 +78,12 @@ class VideoAnalyzer:
         energy_prob = 0
         frameCounter = 0
 
-        
+        # load the video
         cap = cv2.VideoCapture('{}-input.mp4'.format(video_path))
-        
+        # get the fps of the video
         fps = cap.get(cv2.CAP_PROP_FPS)
         print("DEBUG: fps: {}".format(fps))
-        #creating video writer to write the output video: the output video extension is avi so that ffmepeg can merge it later with the audio with no need for additional configurations
+        #creating video writer to write the output video
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
         output_video = cv2.VideoWriter('{}-temp.mp4'.format(video_path), fourcc, fps , frameSize = (int(cap.get(3)), int(cap.get(4))))
 
@@ -118,11 +107,11 @@ class VideoAnalyzer:
             if cv2.waitKey(1) & 0xFF == ord('q'):
                  break
         cap.release()
+        # release the video writer and close all windows
         cv2.destroyAllWindows()
-        #os.remove('{}.webm'.format(video_path))
-        # calculate what is the most frequent energy in the video: Energetic or Not Energetic
+        # calculate what is the most frequent energy
         energy = max(set(energy_per_frame), key=energy_per_frame.count)
-
+        # delete the facial model object to free up memory
         del facialModel
         result_dict = {
             'iris_pos_per_frame': iris_pos_per_frame,
@@ -132,14 +121,6 @@ class VideoAnalyzer:
             'energy_prob_per_frame': energy_prob_per_frame,
             'most_energy': energy
         }
+        # put the result dictionary in the queue to be used by the main process
         queue.put(result_dict)
-        return 
-
-
-# -------------------for testing the model----------------------- #
-if __name__ == "__main__":
-    VideoAnalyzer.analyze_video('665668d3-8118-4c39-950d-fb6dc829f6b6', '665668d3-8118-4c39-950d-fb6dc829f6b6_1_video', True)
-
-
-
-        
+        return

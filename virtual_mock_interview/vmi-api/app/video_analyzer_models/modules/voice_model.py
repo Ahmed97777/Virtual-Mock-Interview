@@ -203,15 +203,12 @@ class VoiceModel:
     def voiceModel(self, video_path, DEBUG=False):
         
         #create parallel subprocess to execute whisper model
-        #process = subprocess.Popen(["cd",  user_id, "&&","whisper", audio_file,"--model", self.model_type, "--language", "en", "&&", "cd", "../.."])
         # go to user directory and run whisper model
         try:
-            # ["whisper","{}.wav".format(video_id), "--model", self.model_type, "--language", "en"]
-            
             process = subprocess.call('whisper {}.wav --model {} --language en --output_dir {} '.format(video_path,
                                                                                                                  self.model_type,
                                                                                                                  '/'.join(video_path.split('/')[:-1])), # path/to/video --> path/to
-                                                                                                                 shell=True)
+                                                                                                     shell=True)
         except Exception as e:
             print("ERROR: failed to run whisper model")
             print(e)

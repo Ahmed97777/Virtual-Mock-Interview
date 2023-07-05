@@ -98,11 +98,13 @@ const Interview = () => {
 
 
     const handleStartCaptureClick = React.useCallback(() => {
+        console.log('start capture clicked');
         setCapturing(true);
         mediaRecorderRef.current = new MediaRecorder(webcamRef.current.stream, {
-        mimeType: "video/webm;codecs=vp9,opus"
+            mimeType: "video/webm;codecs=vp9,opus"
+          });
 
-    });
+        console.log('in handleStartCaptureClick');
         mediaRecorderRef.current.addEventListener(
             "dataavailable",
             handleDataAvailable
@@ -192,7 +194,7 @@ const Interview = () => {
     // ------------------------------------------------------------
     // ------------------------------------------------------------
     
-
+    const [startFlag, setStartFlag] = useState(false);
     const [timeRemaining, setTimeRemaining] = useState(60*2);
     const [displayTimer, setDisplayTimer] = useState(false);
 
@@ -270,6 +272,7 @@ const Interview = () => {
     function MajorFunction() {
 
             if (counter === 0) {
+                setStartFlag(true);
                 firstStartCapturing();
                 handleClick();
                 sendAndChange2();
@@ -325,6 +328,9 @@ const Interview = () => {
         }, []);
 
     function getQuestion(){
+        if (startFlag === false){
+            return 'Start whenever you are ready, \n Good Luck!'
+        }
         if(currentQuestionIndex < 5){
         return `Q${currentQuestionIndex + 1}: ${currentQuestion}`
         }
@@ -380,7 +386,7 @@ const Interview = () => {
                         <div className= "running-container" >
                             <p className={`time-running ${displayRunningLate ? 'time-running-update' : ''}`} >Time Low</p>
                         </div>
-                        <div className="question" id={`${cameraViewToggle ? 'questionId' : 'questionId-without-video'}`} style={{ display: showFirstQuestion ? 'block' : 'none' }}>
+                        <div className="question" id={`${cameraViewToggle ? 'questionId' : 'questionId-without-video'}`}>
                             {getQuestion()}
                         </div>
 

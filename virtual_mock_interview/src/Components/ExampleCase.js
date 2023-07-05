@@ -8,12 +8,13 @@ const ExampleCase = () => {
     useEffect(() => {
         window.scrollTo(0, 0);
         }, []);
-
+    
     const [isClicked, setIsClicked] = useState(false);
     const handleClick = () => {
         setIsClicked(true);
-    }
 
+
+    }
 
     return (
 
@@ -36,8 +37,8 @@ const ExampleCase = () => {
                             <i className="fas fa-microphone"></i>
                         </div>
                         <div className="question">Example: What is your biggest strength?</div>
-                        <div className='ex-start-holder' ><button className="ex-start" onClick={handleClick} >1- Start Answer </button></div>
-                        <div className='ex-next-holder' ><button className="ex-next" >2- Next question </button></div>
+                        <div className='ex-start-holder' ><button className="ex-start" onClick={handleClick} >Start Answer </button></div>
+                       
                     </div>
                 </div>
 

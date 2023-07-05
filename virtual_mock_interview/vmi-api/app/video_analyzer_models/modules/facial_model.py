@@ -54,7 +54,6 @@ class FacialModel:
         # load mediapipe face mesh
         self.mp_face_mesh = mp.solutions.face_mesh
         self.mp_face_detection = mp.solutions.face_detection
-        # load emotion model
         self.DEBUG = False
 
 
@@ -178,15 +177,25 @@ class FacialModel:
 
         Args:
             - frame: cv2 frame to be analyzed.
+            - oldEmotion: previous emotion detected.
+            - oldEmotionProb: previous emotion probability.
+            - oldEnergy: previous energy detected.
+            - oldEnergyProb: previous energy probability.
+            - frameCounter: frame counter.
+            - fps: frames per second.
             -DEBUG (bool, optional): A flag indicating whether to enable debug mode, which displays additional visualizations of the process. Defaults to False.
 
         Returns:
-            tuple: A tuple containing two values: iris_pos and facial_emotion. 
+            tuple: A tuple containing:
+                - emotion (str): The emotion detected in the current frame.
+                - emotion_prob (float): The probability of the detected emotion.
+                - energy (str): The energy detected in the current frame.
+                - energy_prob (float): The probability of the detected energy.
+                - frame (cv2 frame): The frame with the detected facial landmarks.
         '''
-        # get facial emotion analysis
-        
-            
-        frame, facial_emotion, facial_emotion_prob, energitic, energy_prob = self.facialEmotionAnalysis(frame, oldEmotion, oldEmotionProb, oldEnergy, oldEnergyProb, frameCounter, fps, DEBUG)
+
+        # get facial emotion analysis    
+        frame, facial_emotion, facial_emotion_prob, energetic, energy_prob = self.facialEmotionAnalysis(frame, oldEmotion, oldEmotionProb, oldEnergy, oldEnergyProb, frameCounter, fps, DEBUG)
             
 
         # get facial landmarks using mediapipe face mesh model
@@ -267,16 +276,28 @@ class FacialModel:
                             1
                     )
 
-        return iris_pos, facial_emotion, facial_emotion_prob, energitic, energy_prob, frame
+        return iris_pos, facial_emotion, facial_emotion_prob, energetic, energy_prob, frame
 
     def facialEmotionAnalysis(self, frame, oldEmotion, oldEmotionProb, oldEnergy, oldEnergyProb, frameCounter, fps, DEBUG = False):
         '''
         Analyzes the facial emotion of the given frame using the pre-trained EmotionModel and mediapipe FaceDetection model.
         Args:
             -frame: cv2 frame to be analyzed for facial emotion.
+            -oldEmotion: The previous emotion detected in the video.
+            -oldEmotionProb: The probability of the previous emotion detected in the video.
+            -oldEnergy: The previous energy detected in the video.
+            -oldEnergyProb: The probability of the previous energy detected in the video.
+            -frameCounter: The current frame number.
+            -fps: The current frames per second.
+            -DEBUG: Boolean value to determine whether or not to display debug information on the frame.
 
         Returns:
-            tuple: A tuple containing the original frame with the predicted emotion label and a string representing the predicted emotion, or None if no faces were detected in the frame.
+            tuple: A tuple containing:
+                -frame: The frame with the facial emotion analysis displayed on it.
+                -emotion: The emotion detected in the frame.
+                -emotionProb: The probability of the emotion detected in the frame.
+                -energy: The energy detected in the frame.
+                -energyProb: The probability of the energy detected in the frame.
         '''
         # get a copy of the original frame
         orignal_frame = frame.copy()
@@ -288,7 +309,7 @@ class FacialModel:
             # convert the frame to RGB color space for the face detection model
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             results = face_detection.process(frame)
-            # if no faces were detected, return the original frame and None
+            # if no faces were detected, return the original frame and the previous emotion and energy
             if(results.detections == None):
                 print("ERROR - facial_model.py: No faces detected")
                 return orignal_frame, oldEmotion, oldEmotionProb, oldEnergy, oldEnergyProb
@@ -306,7 +327,7 @@ class FacialModel:
                 print("ERROR - facial_model.py: resizing the face failed")
                 return orignal_frame, oldEmotion, oldEmotionProb, oldEnergy, oldEnergyProb
 
-
+            # if the frame is not a multiple of the fps, return the original frame and the previous emotion and energy
             if frameCounter % (fps) != 0:
                 cv2.putText(orignal_frame, '{}: {:0.2f}'.format(oldEnergy, oldEnergyProb), (x-2, y-10), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 0), 2)
                 cv2.rectangle(orignal_frame,(x,y),(x+w,y+h),(255, 255, 0), 2)
@@ -321,21 +342,22 @@ class FacialModel:
                 cv2.putText(orignal_frame, '{}: {:0.2f}'.format(oldEnergy, oldEnergyProb), (x-2, y-10), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 0), 2)
                 cv2.rectangle(orignal_frame,(x,y),(x+w,y+h),(255, 255, 0), 2)
                 return orignal_frame, oldEmotion, oldEmotionProb, oldEnergy, oldEnergyProb
+            
             # To calculate energy probablity:
             # if the new emotion is sad, then the energy probablity is the probablity of sad
             # if new emotion == neutral, then the energy probablity  = 0.5 prob of neutral
             # else: high energy --> 0.5 prob of new emotion + 0.5 prob of the new emotion 
             if newEmotion in ["sad"]:
-                isEnergitic = "Not Energetic"
+                isEnergetic = "Not Energetic"
                 energyProb = newEmotionProb * 0.3  # new energy probabality is in the range of 0.0 to 0.3 --> sad
             else:
-                isEnergitic = "Energetic" 
+                isEnergetic = "Energetic" 
                 # energy prob will be 0.3 to 0.6 if the new emotion is neutral, and 0.6 to 1.0 if the new emotion is other than neutral and sad 
                 energyProb = ((newEmotionProb * 0.3) + 0.3) if newEmotion in ['neutral'] else ((newEmotionProb * 0.4)  +0.6)
 
-            cv2.putText(orignal_frame, '{}: {:0.2f}'.format(isEnergitic, energyProb), (x-2, y-10), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 0), 2)
+            cv2.putText(orignal_frame, '{}: {:0.2f}'.format(isEnergetic, energyProb), (x-2, y-10), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 0), 2)
             cv2.rectangle(orignal_frame,(x,y),(x+w,y+h),(255, 255, 0), 2)
-        return orignal_frame, newEmotion, newEmotionProb, isEnergitic, energyProb
+        return orignal_frame, newEmotion, newEmotionProb, isEnergetic, energyProb
 
 # -------------------for testing the model----------------------- #
 if __name__ == "__main__":
