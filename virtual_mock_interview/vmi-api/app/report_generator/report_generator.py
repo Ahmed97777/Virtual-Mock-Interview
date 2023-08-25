@@ -294,7 +294,8 @@ class ReportGenerator:
 
         
         ax.plot(x_as, r)
-        ax.set_xticks(x_as[:-1], cat)
+        ax.set_xticks(x_as[:-1])
+        ax.set_xticklabels(cat)
 
         # Set yticks
         plt.yticks([20, 40, 60, 80, 100], ["20", "40", "60", "80", "100"])

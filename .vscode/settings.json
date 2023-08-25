@@ -1,0 +1,6 @@
+{
+    "cmake.configureOnOpen": false
+    "terminal.integrated.env.linux": {
+    "PATH": "${env:PATH}"
+},
+}
