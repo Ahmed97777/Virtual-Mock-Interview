@@ -1,0 +1,16 @@
+configparser==6.0.0
+cryptography==41.0.3
+Flask==2.3.3
+Flask-Cors==4.0.0
+flask-marshmallow==0.15.0
+Flask-Migrate==4.0.4
+Flask-RESTful==0.3.10
+librosa==0.10.1
+mediapipe==0.8.11
+openai==0.27.9
+openai-whisper @ git+https://github.com/openai/whisper.git@e8622f9afc4eba139bf796c210f5c01081000472
+opencv-python==4.8.0.76
+pandas==2.0.3
+PyMySQL==1.1.0
+python-dotenv==1.0.0
+rmn==3.1.1
