@@ -1,0 +1,16 @@
+# this is an example of a .flaskenv , remove the "_example and fill in your configuration details"
+
+FLASK_APP=run.py
+FLASK_ENV=development
+FLASK_DEBUG=1
+FLASK_RUN_HOST=0.0.0.0
+FLASK_RUN_PORT=5000
+DB_NAME=vmi-schema
+DB_USER=admin               # fill in your DB username
+DB_PASSWORD=**************  # fill in your DB password
+DB_HOST=localhost
+SECRET_KEY=****************  # fill in your secret key
+UPLOAD_FOLDER = uploads
+DOWNLOAD_FOLDER = downloads
+ORG = "org-**********************"  # fill in your OpenAI organization id
+OPENAI_API_KEY = "********************" # fill in your OpenAI API key
