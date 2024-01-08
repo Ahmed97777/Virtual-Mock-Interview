@@ -55,7 +55,7 @@
       password: #set your own password
      ```
      then test the connection, if successful press ok and click on _vmi_schema_
-   - Right click on tables, _table data import wizard_ and add the questions.csv file which could be found in _#####link_
+   - Right click on tables, _table data import wizard_ and add the questions.csv file which could be found here [questions.csv](https://github.com/Ahmed97777/Virtual-Mock-Interview/blob/main/virtual_mock_interview/vmi-api/questions.csv)
   6. locate `.flaskenv_example` in the backend directory, rename it to `.flaskenv`, and add your database credentials.
      You will also need an OpenAI API key which could be optained from [API Keys](https://platform.openai.com/account/api-keys)
   8. Initing the flask server and the local file server:
@@ -70,7 +70,7 @@
      - Start the npm server via `npm start`
 
 #### Documentation
-Detailed documentation could be found in docs/
+Detailed documentation could be found in [docs](https://github.com/Ahmed97777/Virtual-Mock-Interview/tree/main/docs)
 
 #### Issues or inquiries
 Please reach out if you have any question regarding this project by openning an issue, DMing one of the three contributers or email me at _ahmedalycess@gmail.com_
